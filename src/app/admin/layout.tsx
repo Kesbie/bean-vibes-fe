@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import React, { useState } from 'react';
 import { Layout, Menu, Avatar, Dropdown, Button, theme } from 'antd';
@@ -13,9 +13,12 @@ import {
   TeamOutlined,
   FileTextOutlined,
   BarChartOutlined,
+  ShopOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
+import { ROLES } from '@/constants';
 
 const { Header, Sider, Content } = Layout;
 
@@ -24,12 +27,17 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [collapsed, setCollapsed] = useState(false);
-  const { user, logout } = useAuth();
   const router = useRouter();
+  const [collapsed, setCollapsed] = useState(false);
+  const { user, logout, isLoading } = useAuth();
+
   const {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   const handleLogout = () => {
     logout();
@@ -64,27 +72,37 @@ export default function AdminLayout({
     {
       key: '/admin',
       icon: <DashboardOutlined />,
-      label: 'Dashboard',
+      label: 'Tổng quan',
     },
     {
       key: '/admin/users',
       icon: <TeamOutlined />,
-      label: 'Users',
+      label: 'Tài khoản',
+    },
+    {
+      key: '/admin/places',
+      icon: <ShopOutlined />,
+      label: 'Địa điểm',
+    },
+    {
+      key: '/admin/reviews',
+      icon: <EditOutlined />,
+      label: 'Bài đánh giá',
     },
     {
       key: '/admin/reports',
       icon: <FileTextOutlined />,
-      label: 'Reports',
+      label: 'Báo cáo',
     },
     {
-      key: '/admin/analytics',
+      key: '/admin/restricted-words',
       icon: <BarChartOutlined />,
-      label: 'Analytics',
+      label: 'Từ khóa nhạy cảm',
     },
     {
-      key: '/admin/settings',
+      key: '/admin/categories',
       icon: <SettingOutlined />,
-      label: 'Settings',
+      label: 'Danh mục',
     },
   ];
 
@@ -180,7 +198,7 @@ export default function AdminLayout({
                 />
                 {!collapsed && (
                   <span style={{ color: '#666' }}>
-                    {user?.email || 'Admin User'}
+                    {user?.name || 'Admin User'}
                   </span>
                 )}
               </div>
@@ -189,13 +207,15 @@ export default function AdminLayout({
         </Header>
         
         <Content
+          className=''
           style={{
-            margin: '24px',
-            padding: 24,
-            minHeight: 280,
+            margin: 16,
+            padding: 16,
+            height: 'calc(100vh - 96px)', // Fixed height: viewport height minus header and margins
             background: colorBgContainer,
             borderRadius: borderRadiusLG,
-            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)'
+            boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
+            overflow: 'hidden' // Enable scrolling when content exceeds the fixed height
           }}
         >
           {children}

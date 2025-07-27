@@ -1,13 +1,25 @@
-import BaseService from "../base";
+import { promise, promisePaginated } from "../promise";
+import { omit } from "lodash";
 
-class UserService extends BaseService {
-  #END_POINT = '/users'
-
-  getUser: App.Services.UserService.GetUser = async (id: string) => {
-    const response = await this.axios.get(`${this.#END_POINT}/${id}`);
-    return response.data;
-  }
+const getUsers: App.Services.UserService.GetUsers = async (filters) => {
+  return promisePaginated<App.Types.User.UserResponse>((axios) => axios.get("/users", { params: filters }));
 }
 
+const getUser: App.Services.UserService.GetUser = async (id: string) => {
+  return promise<App.Types.User.UserResponse>((axios) => axios.get(`/users/${id}`));
+}
 
-export default UserService;
+const addUser: App.Services.UserService.AddUser = async (payload) => {
+  return promise<App.Types.User.UserResponse>((axios) => axios.post("/users", payload));
+}
+
+const updateUser: App.Services.UserService.UpdateUser = async (payload) => {
+  return promise<App.Types.User.UserResponse>((axios) => axios.patch(`/users/${payload.id}`, omit(payload, 'id')));
+}
+
+export {
+  getUser,
+  getUsers,
+  addUser,
+  updateUser
+}

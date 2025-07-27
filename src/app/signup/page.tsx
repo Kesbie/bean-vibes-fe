@@ -11,12 +11,11 @@ import {
   EyeTwoTone
 } from "@ant-design/icons";
 import AuthService from "@/services/auth";
-import LocalStorage from "@/services/storages/localStorage";
+import { localStorageService } from "@/services/storages";
 
 const { Title, Text } = Typography;
 
 const authService = new AuthService();
-const localStorage = new LocalStorage();
 
 export default function SignupPage() {
   const [form] = Form.useForm();
@@ -45,9 +44,12 @@ export default function SignupPage() {
       if (response.code >= 200 && response.code < 300 && response.data) {
         // Save tokens and user data
         const { access, refresh } = response.data.tokens;
-        localStorage.save("user", response.data.user);
-        localStorage.save("accessToken", access.token);
-        localStorage.save("refreshToken", refresh.token);
+
+        console.log(response.data)
+
+        localStorageService.save("user", response.data.user);
+        localStorageService.save("accessToken", access.token);
+        localStorageService.save("refreshToken", refresh.token);
         
         // Show verification message instead of redirecting
         setStatus("success");

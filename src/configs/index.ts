@@ -16,7 +16,10 @@ const production = {
   },
 }
 
-const config = { development, production }
+const config = { development, production } as {
+  development: typeof development,
+  production: typeof production,
+}
 const env: 'development' | 'production' = process.env.NODE_ENV as 'development' | 'production' || 'development'
 
 export default config[env];

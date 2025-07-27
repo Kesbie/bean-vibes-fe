@@ -2,6 +2,8 @@ class LocalStorage {
   load(key: string) {
     if (typeof window === 'undefined') return null;
     const value = localStorage.getItem(key);
+    if (value === 'undefined') return null;
+
     return value ? JSON.parse(value) : null;
   }
 
@@ -16,4 +18,6 @@ class LocalStorage {
   }
 }
 
-export default LocalStorage;
+const localStorageService = new LocalStorage();
+
+export default localStorageService;

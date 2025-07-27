@@ -4,4 +4,8 @@ declare namespace App.Types.Base {
     createdAt: string;
     updatedAt: string;
   };
+
+  type BaseFilter = {
+    
+  }
 }
