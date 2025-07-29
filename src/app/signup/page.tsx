@@ -10,20 +10,21 @@ import {
   EyeInvisibleOutlined,
   EyeTwoTone
 } from "@ant-design/icons";
-import AuthService from "@/services/auth";
+import { authService } from "@/services";
 import { localStorageService } from "@/services/storages";
+import { useAuth } from "@/components/providers/AuthProvider";
+import { sendVerifyEmail } from "@/services/auth";
 
 const { Title, Text } = Typography;
-
-const authService = new AuthService();
 
 export default function SignupPage() {
   const [form] = Form.useForm();
   const router = useRouter();
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
   const [status, setStatus] = React.useState<"form" | "success">("form");
   const [message, setMessage] = React.useState<string>("");
+  const [error, setError] = React.useState<string | null>()
+
+  const { signup, isLoading, sendVerifyEmail } = useAuth()
 
   const onFinish = async (values: {
     email: string;
@@ -31,39 +32,48 @@ export default function SignupPage() {
     name: string;
     confirmPassword: string;
   }) => {
-    setIsLoading(true);
-    setError(null);
 
-    try {
-      const response = await authService.register({
-        email: values.email,
-        password: values.password,
-        name: values.name,
-      });
+    signup({
+      email: values.email,
+      password: values.password,
+      name: values.name
+    }).then(() => {
+      setStatus('success')
+    }).catch((error) => {
+      setError(error?.message || "Có lỗi xảy ra")
+    })
 
-      if (response.code >= 200 && response.code < 300 && response.data) {
-        // Save tokens and user data
-        const { access, refresh } = response.data.tokens;
 
-        console.log(response.data)
+    // try {
+    //   const response = await authService.register({
+    //     email: values.email,
+    //     password: values.password,
+    //     name: values.name,
+    //   });
 
-        localStorageService.save("user", response.data.user);
-        localStorageService.save("accessToken", access.token);
-        localStorageService.save("refreshToken", refresh.token);
-        
-        // Show verification message instead of redirecting
-        setStatus("success");
-        setMessage("Account created successfully! Please check your email to verify your account.");
-      } else {
-        setError(response.message || "Registration failed. Please try again.");
-      }
-    } catch (error: unknown) {
-      console.error("Registration failed:", error);
-      const errorMessage = error instanceof Error ? error.message : "Registration failed. Please try again.";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
+    //   if (response.code >= 200 && response.code < 300 && response.data) {
+    //     // Save tokens and user data
+    //     const { access, refresh } = response.data.tokens;
+
+    //     console.log(response.data)
+
+    //     localStorageService.save("user", response.data.user);
+    //     localStorageService.save("accessToken", access.token);
+    //     localStorageService.save("refreshToken", refresh.token);
+
+    //     // Show verification message instead of redirecting
+    //     setStatus("success");
+    //     setMessage("Account created successfully! Please check your email to verify your account.");
+    //   } else {
+    //     setError(response.message || "Registration failed. Please try again.");
+    //   }
+    // } catch (error: unknown) {
+    //   console.error("Registration failed:", error);
+    //   const errorMessage = error instanceof Error ? error.message : "Registration failed. Please try again.";
+    //   setError(errorMessage);
+    // } finally {
+    //   setIsLoading(false);
+    // }
   };
 
   const handleLoginClick = () => {
@@ -71,12 +81,8 @@ export default function SignupPage() {
   };
 
   const handleVerifyClick = () => {
-    setIsLoading(true);
-    authService.sendVerifyEmail().then(res => {
-      console.log('send verify email success', res)
-    }).finally(() => {
-      setIsLoading(false);
-    })
+    // setIsLoading(true);
+    sendVerifyEmail()
   }
 
   if (status === "success") {
@@ -101,7 +107,7 @@ export default function SignupPage() {
               <Text className="text-base text-gray-600 mb-6 block">
                 {message}
               </Text>
-              
+
               <Alert
                 message="Important Notice"
                 description="You must verify your email to comment, like, or review. Please check your inbox and click the verification link."

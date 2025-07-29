@@ -22,24 +22,12 @@ const logout: App.Services.AuthService.logout = () => {
 
 
 const verifyEmail: App.Services.AuthService.verifyEmail = (token: string) => {
-
-  return new Promise((resolve, reject) => {
-    axiosInstance.post(`${END_POINT}/verify-email`, { token }).then((res) => {
-      resolve(res.data)
-    }).catch((err) => {
-      reject(err) 
-    })
-  })
+  return promise((axios => axios.post(`${END_POINT}/verify-email`, { token })))
 }
 
-const sendVerifyEmail: App.Services.AuthService.sendVerifyEmail = () => {
-  return new Promise((resolve, reject) => {
-    axiosInstance.post(`${END_POINT}/send-verify-email`).then((res) => {
-      resolve(res.data)
-    }).catch((err) => {
-      reject(err)
-    })  
-  })
+const sendVerifyEmail: App.Services.AuthService.sendVerifyEmail = (id) => {
+  return promise((axios => axios.post(`${END_POINT}/send-verification-email`, { id })))
 }
+
 
 export { login, register, refreshToken, logout, verifyEmail, sendVerifyEmail }

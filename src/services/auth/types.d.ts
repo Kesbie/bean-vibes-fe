@@ -16,13 +16,7 @@ declare namespace App.Services.AuthService {
   }
 
   type LoginResponse = {
-    user: {
-      id: string;
-      email: string;
-      name: string;
-      role: string;
-      isEmailVerified: boolean;
-    };
+    user: App.Types.User.UserResponse;
     tokens: {
       access: {
         token: string;
@@ -60,8 +54,8 @@ declare namespace App.Services.AuthService {
 
   type login = (credentials: LoginCredentials) => Response<LoginResponse>;
   type register = (credentials: RegisterCredentials) => Response<RegisterResponse>;
-  type logout = () => Promise<void>;
+  type logout = () => Response<void>;
   type refreshToken = (payload: RefreshTokenPayload) => Response<RefreshTokenResponse>;
   type verifyEmail = (token: string) => Response<VerifyEmailResponse>;
-  type sendVerifyEmail = () => Response<SendVerifyEmailResponse>;
+  type sendVerifyEmail = (id: string) => Response<SendVerifyEmailResponse>;
 }

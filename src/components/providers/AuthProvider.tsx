@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import localStorageService from "@/services/storages/localStorage";
 import { decodeJwt } from "jose";
+import { message } from 'antd'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +24,10 @@ const isAdminRoute = () => {
     window.location.pathname.startsWith("/admin")
   );
 };
+
+const isAdmin = (role: string) => {
+  return role !== 'user'
+}
 
 // Utility function to check if token is expired
 const isTokenExpired = (token?: string): boolean => {
@@ -67,6 +72,8 @@ type AuthContextType = {
   loginError: Error;
   isLoginLoading: boolean;
   isAdmin: boolean;
+  signup: App.Services.AuthService.register;
+  sendVerifyEmail: App.Services.AuthService.sendVerifyEmail;
 };
 
 const AuthContext = React.createContext<AuthContextType>({
@@ -77,8 +84,10 @@ const AuthContext = React.createContext<AuthContextType>({
   logout: null,
   refreshToken: null,
   loginError: null,
+  sendVerifyEmail: null,
   isLoginLoading: false,
-  isAdmin: false
+  isAdmin: false,
+  signup: null
 });
 
 export const useAuth = () => {
@@ -87,7 +96,7 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = React.useState<
-    App.Services.AuthService.LoginResponse["user"]
+    App.Services.AuthService.LoginResponse["user"] | null
   >(localStorageService.load("user"));
   const [isLoading, setIsLoading] = React.useState(true);
   const router = useRouter();
@@ -200,19 +209,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const loginMutation = useMutation({
     mutationFn: authService.login,
     onSuccess: (res) => {
-      const { access, refresh } = res.data.tokens;
-      const { role } = res.data.user;
+      if (res.data) {
+        const { access, refresh } = res.data.tokens;
+        const { role } = res.data.user;
 
-      localStorageService.save("user", res.data.user);
-      localStorageService.save("accessToken", access.token);
-      localStorageService.save("refreshToken", refresh.token);
+        localStorageService.save("user", res.data.user);
+        localStorageService.save("accessToken", access.token);
+        localStorageService.save("refreshToken", refresh.token);
+        setUser(res.data.user)
 
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+        queryClient.invalidateQueries({ queryKey: ["user"] });
 
-      if (role === "admin") {
-        router.push("/admin");
+        if (isAdmin(role)) {
+          router.push("/admin");
+        } else {
+          router.push("/");
+        }
       } else {
-        router.push("/");
+        message.error('Email hoặc mật khẩu sai! Vui lòng thử lại')
       }
     },
     onError: (error) => {
@@ -245,12 +259,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     onSuccess: (res) => {
       const { access, refresh } = res.data.tokens;
 
+      setUser(res.data.user)
+
       localStorageService.save("user", res.data.user);
       localStorageService.save("accessToken", access.token);
       localStorageService.save("refreshToken", refresh.token);
       queryClient.invalidateQueries({ queryKey: ["user"] });
     }
   });
+
+  const sendVerifyEmailMutation = useMutation({
+    mutationFn: authService.sendVerifyEmail,
+    onSuccess: () => { setIsLoading(false) }
+  })
 
   const login = (credentials: App.Services.AuthService.LoginCredentials) => {
     return loginMutation.mutateAsync(credentials);
@@ -262,10 +283,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return signupMutation.mutateAsync(credentials);
   };
 
+  const sendVerifyEmail = () => {
+    setIsLoading(true)
+    return (sendVerifyEmailMutation.mutateAsync(user.id))
+  }
+
   const logout = () => {
     localStorageService.delete("accessToken");
     localStorageService.delete("refreshToken");
     localStorageService.delete("user");
+    setUser(null)
     queryClient.clear();
 
     // Check if current path is admin route and redirect
@@ -301,6 +328,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signup,
     logout,
     refreshToken,
+    sendVerifyEmail,
     loginError: loginMutation.error,
     isAdmin:
       user?.role === "admin" ||
