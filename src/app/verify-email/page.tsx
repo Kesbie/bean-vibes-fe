@@ -1,217 +1,100 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Card, Typography, Button, Result, Spin, Alert } from "antd";
-import {
-  CheckCircleOutlined,
-  CloseCircleOutlined,
-  ExclamationCircleOutlined,
-  HomeOutlined,
-  LoginOutlined,
-} from "@ant-design/icons";
-import AuthService from "@/services/auth";
-import LocalStorage from "@/services/storages/localStorage";
-import { useMutation } from "@tanstack/react-query";
+import React from 'react';
+import { Card, Button, message, Result } from 'antd';
+import { CheckCircleOutlined, ExclamationCircleOutlined } from '@ant-design/icons';
+import { useMutation } from '@tanstack/react-query';
+import { verifyEmail } from '@/services/profile';
+import { useSearchParams, useRouter } from 'next/navigation';
 
-const { Title, Text } = Typography;
-
-const authService = new AuthService();
-const localStorage = new LocalStorage();
-
-type VerificationStatus = "loading" | "success" | "error" | "invalid";
-
-export default function VerifyEmailPage() {
-  const router = useRouter();
+const VerifyEmailPage = () => {
+  const [messageApi, contextHolder] = message.useMessage();
   const searchParams = useSearchParams();
-  const [status, setStatus] = useState<VerificationStatus>("loading");
-  const [message, setMessage] = useState<string>("");
-  const [error, setError] = useState<string>("");
+  const router = useRouter();
+  const token = searchParams.get('token');
 
-  const verifyMutation = useMutation({
-    mutationFn: authService.verifyEmail,
-    onSuccess: (res) => {
-      console.log('verify success', res)
+  const verifyEmailMutation = useMutation({
+    mutationFn: (token: string) => verifyEmail(token),
+    onSuccess: () => {
+      messageApi.success('Xác thực email thành công!');
+      setTimeout(() => {
+        router.push('/profile');
+      }, 2000);
     },
-    onError: (error) => {
-      console.error('verify error', error)
+    onError: (error: any) => {
+      messageApi.error(error?.message || 'Có lỗi xảy ra khi xác thực email');
+    },
+  });
+
+  const handleVerifyEmail = async () => {
+    if (!token) {
+      messageApi.error('Token không hợp lệ!');
+      return;
     }
-  })
 
-  // useEffect(() => {
-  //   const verifyEmail = async () => {
-  //     const token = searchParams.get("token");
-
-  //     if (!token) {
-  //       setStatus("invalid");
-  //       setError("Verification token is missing. Please check your email for the correct verification link.");
-  //       return;
-  //     }
-
-  //     try {
-  //       const response = await verifyMutation.mutateAsync(token);
-
-  //       const currentUser = localStorage.load("user");
-
-  //       if (response.code === 204) {
-  //         localStorage.save("user", { ...currentUser, isEmailVerified: true });
-  //         setStatus("success");
-  //         setMessage(response.data.message || "Your email has been successfully verified!");
-  //       } else {
-  //         setStatus("error");
-  //         setError(response.message || "Email verification failed. Please try again.");
-  //       }
-  //     } catch (error: unknown) {
-  //       console.error("Email verification error:", error);
-  //       setStatus("error");
-  //       const errorMessage = error instanceof Error ? error.message : "Email verification failed. Please try again.";
-  //       setError(errorMessage);
-  //     }
-  //   };
-
-  //   verifyEmail();
-  // }, [searchParams, verifyMutation]);
-
-  const handleGoHome = () => {
-    router.push("/");
+    try {
+      await verifyEmailMutation.mutateAsync(token);
+    } catch (error) {
+      console.error('Error verifying email:', error);
+    }
   };
 
-  const handleGoLogin = () => {
-    router.push("/login");
-  };
+  React.useEffect(() => {
+    if (token) {
+      handleVerifyEmail();
+    }
+  }, [token]);
 
-  const renderContent = () => {
-    switch (status) {
-      case "loading":
-        return (
-          <Result
-            icon={<Spin size="large" />}
-            title="Verifying Your Email"
-            subTitle="Please wait while we verify your email address..."
-          />
-        );
-
-      case "success":
-        return (
-          <Result
-            status="success"
-            icon={<CheckCircleOutlined />}
-            title="Email Verified Successfully!"
-            subTitle={message}
-            extra={[
-              <Button
-                type="primary"
-                key="home"
-                icon={<HomeOutlined />}
-                onClick={handleGoHome}
-                size="large"
-              >
-                Go to Home
-              </Button>,
-              <Button
-                key="login"
-                icon={<LoginOutlined />}
-                onClick={handleGoLogin}
-                size="large"
-              >
-                Sign In
-              </Button>,
-            ]}
-          />
-        );
-
-      case "error":
-        return (
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="w-full max-w-md">
           <Result
             status="error"
-            icon={<CloseCircleOutlined />}
-            title="Verification Failed"
-            subTitle={error}
-            extra={[
-              <Button
-                type="primary"
-                key="login"
-                icon={<LoginOutlined />}
-                onClick={handleGoLogin}
-                size="large"
-              >
-                Go to Login
-              </Button>,
-              <Button
-                key="home"
-                icon={<HomeOutlined />}
-                onClick={handleGoHome}
-                size="large"
-              >
-                Go to Home
-              </Button>,
-            ]}
-          />
-        );
-
-      case "invalid":
-        return (
-          <Result
-            status="warning"
             icon={<ExclamationCircleOutlined />}
-            title="Invalid Verification Link"
-            subTitle={error}
+            title="Token không hợp lệ"
+            subTitle="Link xác thực email không hợp lệ hoặc đã hết hạn."
             extra={[
-              <Button
-                type="primary"
-                key="login"
-                icon={<LoginOutlined />}
-                onClick={handleGoLogin}
-                size="large"
-              >
-                Go to Login
-              </Button>,
-              <Button
-                key="home"
-                icon={<HomeOutlined />}
-                onClick={handleGoHome}
-                size="large"
-              >
-                Go to Home
+              <Button type="primary" key="login" onClick={() => router.push('/login')}>
+                Quay lại trang đăng nhập
               </Button>,
             ]}
           />
-        );
-
-      default:
-        return null;
-    }
-  };
+        </Card>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-pink-100 p-4">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8">
+      {contextHolder}
       <div className="w-full max-w-md">
-        <Card className="shadow-xl border-0">
-          <div className="text-center mb-8">
-            <Title level={2} className="mb-2 text-gray-800">
-              Email Verification
-            </Title>
-            <Text type="secondary" className="text-base">
-              {status === "loading" && "Verifying your email address..."}
-              {status === "success" && "Your account is now verified!"}
-              {status === "error" && "Something went wrong"}
-              {status === "invalid" && "Invalid verification link"}
-            </Text>
-          </div>
-
-          {renderContent()}
-
-          {status === "error" && (
-            <Alert
-              message="Need Help?"
-              description="If you're having trouble verifying your email, please contact support or try signing up again."
-              type="info"
-              showIcon
-              className="mt-6"
-            />
-          )}
+        <Card>
+          <Result
+            status={verifyEmailMutation.isSuccess ? "success" : "info"}
+            icon={verifyEmailMutation.isSuccess ? <CheckCircleOutlined /> : undefined}
+            title={
+              verifyEmailMutation.isSuccess 
+                ? "Xác thực email thành công!" 
+                : "Đang xác thực email..."
+            }
+            subTitle={
+              verifyEmailMutation.isSuccess 
+                ? "Tài khoản của bạn đã được xác thực thành công. Bạn sẽ được chuyển đến trang quản lý tài khoản."
+                : "Vui lòng đợi trong khi chúng tôi xác thực email của bạn."
+            }
+            extra={
+              verifyEmailMutation.isSuccess ? [
+                <Button type="primary" key="profile" onClick={() => router.push('/profile')}>
+                  Quản lý tài khoản
+                </Button>,
+              ] : undefined
+            }
+          />
         </Card>
       </div>
     </div>
   );
-} 
+};
+
+export default VerifyEmailPage; 

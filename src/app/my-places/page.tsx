@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Card, Table, Tag, Space, Modal, message, Popconfirm, Input, Select, Switch } from 'antd';
-import { EyeOutlined, EditOutlined, DeleteOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
+import { Button, Card, Table, Tag, Space, Modal, message, Popconfirm, Input, Select } from 'antd';
+import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { placeService } from '@/services';
 import { useRouter } from 'next/navigation';
@@ -13,10 +13,9 @@ import PlaceForm from '@/components/places/PlaceForm';
 const { Search } = Input;
 const { Option } = Select;
 
-export default function AdminPlacesPage() {
+export default function MyPlacesPage() {
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('');
-  const [approvalFilter, setApprovalFilter] = useState<string>('');
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingPlace, setEditingPlace] = useState<App.Types.Place.PlaceResponse | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -25,13 +24,12 @@ export default function AdminPlacesPage() {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  // Fetch admin places
+  // Fetch user's places
   const { data: placesData, isLoading } = useQuery({
-    queryKey: ['admin-places', searchText, statusFilter, approvalFilter, currentPage, pageSize],
-    queryFn: () => placeService.getPlacesAdmin({
+    queryKey: ['my-places', searchText, statusFilter, currentPage, pageSize],
+    queryFn: () => placeService.getMyPlaces({
       search: searchText || undefined,
       status: statusFilter || undefined,
-      isApproved: approvalFilter === 'approved' ? true : approvalFilter === 'pending' ? false : undefined,
       page: currentPage,
       limit: pageSize
     }),
@@ -40,30 +38,13 @@ export default function AdminPlacesPage() {
 
   // Delete place mutation
   const deleteMutation = useMutation({
-    mutationFn: placeService.deleteAdminPlace,
+    mutationFn: placeService.deletePlace,
     onSuccess: () => {
       message.success('Đã xóa địa điểm thành công');
-      queryClient.invalidateQueries({ queryKey: ['admin-places'] });
+      queryClient.invalidateQueries({ queryKey: ['my-places'] });
     },
     onError: (error: any) => {
       message.error(error?.response?.data?.message || 'Có lỗi xảy ra khi xóa địa điểm');
-    }
-  });
-
-  // Approve/Reject place mutation
-  const approvalMutation = useMutation({
-    mutationFn: ({ id, isApproved, reason }: { id: string; isApproved: boolean; reason?: string }) =>
-      placeService.approvePlace(id, isApproved, reason),
-    onSuccess: (_, variables) => {
-      message.success(
-        variables.isApproved 
-          ? 'Đã duyệt địa điểm thành công' 
-          : 'Đã từ chối địa điểm thành công'
-      );
-      queryClient.invalidateQueries({ queryKey: ['admin-places'] });
-    },
-    onError: (error: any) => {
-      message.error(error?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật trạng thái');
     }
   });
 
@@ -80,35 +61,6 @@ export default function AdminPlacesPage() {
     router.push(`/place/${id}`);
   };
 
-  const handleApproval = (place: App.Types.Place.PlaceResponse, isApproved: boolean) => {
-    Modal.confirm({
-      title: isApproved ? 'Duyệt địa điểm' : 'Từ chối địa điểm',
-      content: (
-        <div>
-          <p>{isApproved ? 'Bạn có chắc chắn muốn duyệt địa điểm này?' : 'Bạn có chắc chắn muốn từ chối địa điểm này?'}</p>
-          {!isApproved && (
-            <Input.TextArea
-              placeholder="Lý do từ chối (tùy chọn)"
-              rows={3}
-              className="mt-2"
-              id="rejection-reason"
-            />
-          )}
-        </div>
-      ),
-      onOk: () => {
-        const reason = !isApproved ? (document.getElementById('rejection-reason') as HTMLTextAreaElement)?.value : undefined;
-        approvalMutation.mutate({ id: place.id, isApproved, reason });
-      },
-      okText: isApproved ? 'Duyệt' : 'Từ chối',
-      cancelText: 'Hủy',
-      okButtonProps: { 
-        type: 'primary',
-        danger: !isApproved 
-      }
-    });
-  };
-
   const handleModalClose = () => {
     setIsModalVisible(false);
     setEditingPlace(null);
@@ -116,7 +68,7 @@ export default function AdminPlacesPage() {
 
   const handleFormSuccess = () => {
     handleModalClose();
-    queryClient.invalidateQueries({ queryKey: ['admin-places'] });
+    queryClient.invalidateQueries({ queryKey: ['my-places'] });
   };
 
   const columns = [
@@ -125,14 +77,6 @@ export default function AdminPlacesPage() {
       dataIndex: 'name',
       key: 'name',
       render: (text: string) => <span className="font-medium">{text}</span>,
-    },
-    {
-      title: 'Người đóng góp',
-      dataIndex: 'createdBy',
-      key: 'createdBy',
-      render: (user: App.Types.User.UserResponse) => (
-        <span className="text-gray-600">{user?.name || 'Không xác định'}</span>
-      ),
     },
     {
       title: 'Địa chỉ',
@@ -184,16 +128,6 @@ export default function AdminPlacesPage() {
       ),
     },
     {
-      title: 'Ngày tạo',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (date: string) => (
-        <span className="text-gray-600">
-          {new Date(date).toLocaleDateString('vi-VN')}
-        </span>
-      ),
-    },
-    {
       title: 'Thao tác',
       key: 'actions',
       render: (_, record: App.Types.Place.PlaceResponse) => (
@@ -210,24 +144,6 @@ export default function AdminPlacesPage() {
             onClick={() => handleEdit(record)}
             title="Chỉnh sửa"
           />
-          {record.isApproved === false && (
-            <Button
-              type="text"
-              icon={<CheckOutlined />}
-              onClick={() => handleApproval(record, true)}
-              title="Duyệt"
-              className="text-green-600"
-            />
-          )}
-          {record.isApproved === false && (
-            <Button
-              type="text"
-              icon={<CloseOutlined />}
-              onClick={() => handleApproval(record, false)}
-              title="Từ chối"
-              className="text-red-600"
-            />
-          )}
           <Popconfirm
             title="Bạn có chắc chắn muốn xóa địa điểm này?"
             description="Hành động này không thể hoàn tác."
@@ -252,8 +168,8 @@ export default function AdminPlacesPage() {
       <ClientLayout>
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Quản lý địa điểm</h1>
-            <p className="text-gray-600">Quản lý và duyệt các địa điểm được đóng góp</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Quản lý địa điểm của tôi</h1>
+            <p className="text-gray-600">Quản lý các địa điểm bạn đã đóng góp</p>
           </div>
 
           <Card>
@@ -270,23 +186,22 @@ export default function AdminPlacesPage() {
                   placeholder="Lọc theo trạng thái"
                   value={statusFilter}
                   onChange={setStatusFilter}
-                  style={{ width: 150 }}
+                  style={{ width: 200 }}
                   allowClear
                 >
                   <Option value="active">Hoạt động</Option>
                   <Option value="inactive">Không hoạt động</Option>
-                </Select>
-                <Select
-                  placeholder="Lọc theo duyệt"
-                  value={approvalFilter}
-                  onChange={setApprovalFilter}
-                  style={{ width: 150 }}
-                  allowClear
-                >
-                  <Option value="approved">Đã duyệt</Option>
                   <Option value="pending">Chờ duyệt</Option>
                 </Select>
               </div>
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => setIsModalVisible(true)}
+                size="large"
+              >
+                Thêm địa điểm mới
+              </Button>
             </div>
 
             <Table
@@ -328,4 +243,4 @@ export default function AdminPlacesPage() {
       </ClientLayout>
     </QueryProvider>
   );
-}
+} 

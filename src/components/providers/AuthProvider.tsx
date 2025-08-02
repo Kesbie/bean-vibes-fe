@@ -80,14 +80,14 @@ const AuthContext = React.createContext<AuthContextType>({
   user: null,
   isLoading: true,
   isAuthenticated: false,
-  login: null,
-  logout: null,
-  refreshToken: null,
+  login: async () => { throw new Error('Login not initialized') },
+  logout: () => {},
+  refreshToken: async () => { throw new Error('Refresh token not initialized') },
   loginError: null,
-  sendVerifyEmail: null,
+  sendVerifyEmail: async () => { throw new Error('Send verify email not initialized') },
   isLoginLoading: false,
   isAdmin: false,
-  signup: null
+  signup: async () => { throw new Error('Signup not initialized') }
 });
 
 export const useAuth = () => {
@@ -209,7 +209,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const loginMutation = useMutation({
     mutationFn: authService.login,
     onSuccess: (res) => {
-      if (res.data) {
+      console.log('Login response full:', res);
+      console.log('res.code:', res.code);
+      console.log('res.data:', res.data);
+      console.log('res.data.user:', res.data?.user);
+      
+      // Kiểm tra status code trước
+      if (res.code !== 200) {
+        console.error('Login failed with status:', res.code, res.message);
+        message.error('Email hoặc mật khẩu sai! Vui lòng thử lại');
+        return;
+      }
+      
+      // Response structure thực tế: { code: 200, data: { user, tokens }, message: 'success' }
+      if (res.data && res.data.user && res.data.tokens) {
         const { access, refresh } = res.data.tokens;
         const { role } = res.data.user;
 
@@ -226,11 +239,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           router.push("/");
         }
       } else {
+        console.error('Invalid login response structure:', res);
         message.error('Email hoặc mật khẩu sai! Vui lòng thử lại')
       }
     },
     onError: (error) => {
       console.error("Login error:", error);
+      message.error('Email hoặc mật khẩu sai! Vui lòng thử lại')
     }
   });
 
@@ -238,16 +253,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     mutationFn: authService.refreshToken,
     onSuccess: (res) => {
       console.log("refreshTokenMutation success:", res);
-      const { access, refresh } = res.data;
-      localStorageService.save("accessToken", access.token);
-      localStorageService.save("refreshToken", refresh.token);
-      getUserMutation.mutate(localStorageService.load("user").id);
+      if (res.data) {
+        const { access, refresh } = res.data;
+        localStorageService.save("accessToken", access.token);
+        localStorageService.save("refreshToken", refresh.token);
+        getUserMutation.mutate(localStorageService.load("user").id);
+      }
     },
     onError: (error) => {
       console.error("Token refresh error:", error);
       logout();
-
-      // Check if current path is admin route and redirect
       if (isAdminRoute()) {
         router.push("/login");
       }
@@ -257,14 +272,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signupMutation = useMutation({
     mutationFn: authService.register,
     onSuccess: (res) => {
-      const { access, refresh } = res.data.tokens;
-
-      setUser(res.data.user)
-
-      localStorageService.save("user", res.data.user);
-      localStorageService.save("accessToken", access.token);
-      localStorageService.save("refreshToken", refresh.token);
-      queryClient.invalidateQueries({ queryKey: ["user"] });
+      if (res.data && res.data.data) {
+        const access = res.data.data.tokens.access;
+        const refresh = res.data.data.tokens.refresh;
+        setUser(res.data.data.user)
+        localStorageService.save("user", res.data.data.user);
+        localStorageService.save("accessToken", access.token);
+        localStorageService.save("refreshToken", refresh.token);
+        queryClient.invalidateQueries({ queryKey: ["user"] });
+      }
     }
   });
 

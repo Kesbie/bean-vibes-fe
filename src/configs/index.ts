@@ -3,7 +3,7 @@ const development = {
     port: process.env.DEV_APP_PORT || 3000,
   },
   api: {
-    url: process.env.DEV_API_URL || 'http://localhost:8000/v1',
+    url: 'http://localhost:8000/v1',
   },
 }
 
@@ -12,7 +12,7 @@ const production = {
     port: process.env.PRO_APP_PORT || 3000,
   },
   api: {
-    url: process.env.PRO_API_URL || 'http://localhost:8000/v1',
+    url: 'http://localhost:8000/v1',
   },
 }
 

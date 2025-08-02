@@ -30,19 +30,23 @@ declare namespace App.Services.AuthService {
   }
 
   type RegisterResponse = {
-    user: App.Types.User.UserResponse;
-    tokens: RefreshTokenResponse;
+    code: number;
+    data: {
+      user: App.Types.User.UserResponse;
+      tokens: RefreshTokenResponse;
+    };
+    message: string;
   }
 
   type RefreshTokenResponse = {
     access: {
       token: string;
       expires: Date;
-    },
+    };
     refresh: {
       token: string;
       expires: Date;
-    }
+    };
   }
 
   type VerifyEmailResponse = {

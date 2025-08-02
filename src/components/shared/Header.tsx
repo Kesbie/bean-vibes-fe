@@ -10,7 +10,8 @@ import {
   LogoutOutlined,
   MenuOutlined,
   CloseOutlined,
-  ShopOutlined
+  ShopOutlined,
+  PlusOutlined
 } from "@ant-design/icons";
 import { useAuth } from "@/components/providers/AuthProvider";
 import { Button, Dropdown, Avatar } from "antd";
@@ -25,24 +26,26 @@ const Header: React.FC = () => {
     router.push("/");
   };
 
+  const handleContributePlace = () => {
+    if (isAuthenticated) {
+      router.push("/contribute-place");
+    } else {
+      router.push("/login");
+    }
+  };
+
   const userMenuItems = [
     {
       key: "profile",
       icon: <UserOutlined />,
-      label: "Profile",
-      onClick: () => router.push("/admin/profile")
+      label: "Quản lý tài khoản",
+      onClick: () => router.push("/profile")
     },
     {
-      key: "places",
+      key: "my-places",
       icon: <ShopOutlined />,
-      label: "Quản lý địa điểm",
-      onClick: () => router.push("/admin/places")
-    },
-    {
-      key: "reviews",
-      icon: <EditOutlined />,
-      label: "Quản lý đánh giá",
-      onClick: () => router.push("/admin/reviews")
+      label: "Địa điểm đã đóng góp",
+      onClick: () => router.push("/my-places")
     },
     {
       type: "divider" as const
@@ -50,7 +53,7 @@ const Header: React.FC = () => {
     {
       key: "logout",
       icon: <LogoutOutlined />,
-      label: "Logout",
+      label: "Đăng xuất",
       onClick: handleLogout
     }
   ];
@@ -73,10 +76,9 @@ const Header: React.FC = () => {
   const navigationLinks = [
     { href: "/", label: "Trang chủ" },
     { href: "/search", label: "Khám phá" },
-    { href: "#", label: "Khuyến mại" },
+    { href: "/search-advanced", label: "Tìm kiếm nâng cao" },
     { href: "#", label: "Giới thiệu" },
-    { href: "#", label: "Liên hệ - Góp ý" },
-    { href: "#", label: "Đóng góp địa điểm" }
+    { href: "#", label: "Liên hệ - Góp ý" }
   ];
 
   return (
@@ -108,6 +110,16 @@ const Header: React.FC = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
+            {/* Contribute Place Button */}
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              className="bg-green-600 border-green-600 hover:bg-green-700 hover:border-green-700"
+              onClick={handleContributePlace}
+            >
+              Đóng góp địa điểm
+            </Button>
+
             {/* Write Review Button */}
             <Button
               type="primary"
@@ -115,8 +127,7 @@ const Header: React.FC = () => {
               className="bg-red-600 border-red-600 hover:bg-red-700 hover:border-red-700"
               onClick={() => {
                 if (isAuthenticated) {
-                  // TODO: Navigate to write review page
-                  console.log("Write review");
+                  router.push("/write-review");
                 } else {
                   router.push("/login");
                 }
@@ -175,6 +186,17 @@ const Header: React.FC = () => {
                   {link.label}
                 </Link>
               ))}
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                className="bg-green-600 border-green-600 hover:bg-green-700 hover:border-green-700 mx-4"
+                onClick={() => {
+                  handleContributePlace();
+                  setIsMobileMenuOpen(false);
+                }}
+              >
+                Đóng góp địa điểm
+              </Button>
             </nav>
           </div>
         )}

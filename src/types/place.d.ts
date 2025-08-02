@@ -19,31 +19,63 @@ declare namespace App.Types.Place {
     password: string;
   }
 
-  type PlaceResponse = App.Types.Base.BaseResponse & {
+  interface PlaceResponse {
+    id: string;
     name: string;
-    photos: string[];
     description: string;
-    address: App.Types.Address.AddressResponse;
-    status: string;
-    categories: App.Types.Category.CategoryResponse[];
-    approvalStatus: string;
-    time: Time;
-    price: Price;
-    wifi: Wifi;
-    averageRating: number;
-    totalRatings: number;
-    viewCount: number;
-    hotScore: number;
-    weeklyViews: number;
-    weeklyHotScore: number;
-    createdBy?: App.Types.User.UserResponse;
-    approvedBy?: App.Types.User.UserResponse;
-  };  
+    address: string;
+    latitude?: number;
+    longitude?: number;
+    phone?: string;
+    website?: string;
+    openingHours?: Record<string, any>;
+    categoryId: string;
+    category?: CategoryResponse;
+    photos?: string[];
+    rating?: number;
+    totalRatings?: number;
+    totalReviews?: number;
+    hotScore?: number;
+    isApproved?: boolean;
+    isVerified?: boolean;
+    status?: 'active' | 'inactive' | 'pending';
+    createdAt: string;
+    updatedAt: string;
+  }
 
-  type PlaceCreate = {
+  interface PlaceCreate {
     name: string;
-    slug?: string;
-    thumbnail?: string;
+    description: string;
+    address: string;
+    latitude?: number;
+    longitude?: number;
+    phone?: string;
+    website?: string;
+    openingHours?: Record<string, any>;
+    categoryId: string;
+    photos?: string[];
+  }
+
+  interface PlaceUpdate {
+    id: string;
+    name?: string;
     description?: string;
-  };
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+    phone?: string;
+    website?: string;
+    openingHours?: Record<string, any>;
+    categoryId?: string;
+    photos?: string[];
+    status?: 'active' | 'inactive';
+    isApproved?: boolean;
+    isVerified?: boolean;
+  }
+
+  interface ContentCheckResponse {
+    hasRestrictedWords: boolean;
+    filteredContent: string;
+    restrictedWords: string[];
+  }
 } 

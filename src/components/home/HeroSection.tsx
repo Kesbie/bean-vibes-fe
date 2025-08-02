@@ -1,9 +1,20 @@
 'use client';
 
-import React from "react";
+import React, { useState } from "react";
 import { SearchOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 
 const HeroSection: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
     <section className="relative bg-gradient-to-r from-orange-50 to-red-50 py-20">
       {/* Background Illustration */}
@@ -29,17 +40,22 @@ const HeroSection: React.FC = () => {
 
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto">
-            <div className="flex bg-white rounded-lg shadow-lg overflow-hidden">
+            <form onSubmit={handleSearch} className="flex bg-white rounded-lg shadow-lg overflow-hidden">
               <input
                 type="text"
-                placeholder="Search"
+                placeholder="Tìm kiếm cafe, địa điểm..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="flex-1 px-6 py-4 text-gray-900 placeholder-gray-500 focus:outline-none"
               />
-              <button className="bg-red-600 text-white px-8 py-4 hover:bg-red-700 transition-colors flex items-center space-x-2">
+              <button 
+                type="submit"
+                className="bg-red-600 text-white px-8 py-4 hover:bg-red-700 transition-colors flex items-center space-x-2"
+              >
                 <SearchOutlined />
                 <span>Tìm kiếm</span>
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </div>

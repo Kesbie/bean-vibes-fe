@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import { Form, Input, Button, Card, Typography, Divider } from "antd";
+import { Form, Input, Button, Card, Typography, Divider, Alert } from "antd";
 import {
   UserOutlined,
   LockOutlined,
@@ -16,15 +16,22 @@ const { Title, Text } = Typography;
 export default function LoginPage() {
   const [form] = Form.useForm();
   const router = useRouter();
+  const [loginError, setLoginError] = React.useState<string | null>(null);
 
-  const { login, isLoginLoading } = useAuth();
+  const auth = useAuth();
+  const { login, isLoginLoading } = auth;
 
   const onFinish = async (values: { email: string; password: string }) => {
-    console.log(values);
+    console.log('Login values:', values);
+    setLoginError(null); // Clear previous errors
+    
     try {
-      await login(values)
+      const result = await login(values);
+      console.log('Login result:', result);
+      // Login success - AuthProvider will handle redirect
     } catch (error) {
       console.error("Login failed:", error);
+      setLoginError("Email hoặc mật khẩu không đúng. Vui lòng thử lại.");
     }
   };
 
@@ -45,18 +52,15 @@ export default function LoginPage() {
             </Text>
           </div>
 
-          {/* {loginError && (
-              <Alert
-                message="Login Failed"
-                description={
-                  loginError?.message ||
-                  "Invalid email or password. Please try again."
-                }
-                type="error"
-                showIcon
-                className="mb-6"
-              />
-            )} */}
+          {loginError && (
+            <Alert
+              message="Đăng nhập thất bại"
+              description={loginError}
+              type="error"
+              showIcon
+              className="mb-6"
+            />
+          )}
 
           <Form
             form={form}

@@ -5,3 +5,4 @@ export * as userService from './user';
 export * as restrictedWordService from './restrictedWords';
 export * as uploadService from './uploads';
 export * as placeService from './places';
+export * as reviewService from './reviews';
