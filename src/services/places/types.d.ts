@@ -1,5 +1,11 @@
 declare namespace App.Services.PlacesService {
-  type getPlaces = (filters?: PaginatedFilters) => PaginatedResponse<App.Types.Places.PlacesResponse>;
+
+  type placeFilters = PaginatedFilters & {
+    categories?: string[];
+    name?: string;
+  }
+
+  type getPlaces = (filters?: placeFilters) => PaginatedResponse<App.Types.Places.PlacesResponse>;
   type getPublicPlaces = (filters?: PaginatedFilters) => PaginatedResponse<App.Types.Places.PlacesResponse>;
   type getPlace = (id: string) => Response<App.Types.Places.PlacesResponse>;
   type getPublicPlace = (id: string) => Response<App.Types.Places.PlacesResponse>;

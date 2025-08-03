@@ -6,33 +6,31 @@ import Providers from "@/components/providers/Providers";
 const quicksand = Quicksand({
   subsets: ["latin"],
   variable: "--font-quicksand",
-  weight: ["300", "400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600", "700"]
 });
 
 const openSans = Open_Sans({
   subsets: ["latin"],
   variable: "--font-open-sans",
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["300", "400", "500", "600", "700", "800"]
 });
 
 export const metadata: Metadata = {
   title: "Bean Vibes",
-  description: "A platform for coffee lovers",
+  description: "A platform for coffee lovers"
 };
 
 export default function RootLayout({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
       <body
-        className={`${quicksand.variable} ${openSans.variable} font-quicksand antialiased`}
+        className={`${quicksand.variable} ${openSans.variable} font-quicksand antialiased bg-gray-50`}
       >
-        <Providers>
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

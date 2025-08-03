@@ -27,7 +27,7 @@ export default function SearchResults() {
     hasWifi: searchParams.get('hasWifi') === 'true',
     hasParking: searchParams.get('hasParking') === 'true',
     sortBy: searchParams.get('sortBy') || 'hotScore',
-    sortOrder: searchParams.get('sortOrder') || 'desc',
+    // sortOrder: searchParams.get('sortOrder') || 'desc',
     page: currentPage,
     limit: pageSize
   };
@@ -40,8 +40,8 @@ export default function SearchResults() {
       page: filters.page,
       ...(filters.search && { search: filters.search }),
       ...(filters.categoryId && { categoryId: filters.categoryId }),
-      ...(filters.district && { district: filters.district }),
-      ...(filters.ward && { ward: filters.ward }),
+      // ...(filters.district && { district: filters.district }),
+      // ...(filters.ward && { ward: filters.ward }),
       ...(filters.priceMin && { priceMin: filters.priceMin }),
       ...(filters.priceMax && { priceMax: filters.priceMax }),
       ...(filters.rating && { rating: filters.rating }),
@@ -49,7 +49,7 @@ export default function SearchResults() {
       ...(filters.hasWifi && { hasWifi: filters.hasWifi }),
       ...(filters.hasParking && { hasParking: filters.hasParking }),
       ...(filters.sortBy && { sortBy: filters.sortBy }),
-      ...(filters.sortOrder && { sortOrder: filters.sortOrder })
+      // ...(filters.sortOrder && { sortOrder: filters.sortOrder })
     }),
     staleTime: 2 * 60 * 1000,
   });
@@ -149,11 +149,11 @@ export default function SearchResults() {
             grid={{
               gutter: 16,
               xs: 1,
-              sm: 2,
-              md: 2,
-              lg: 3,
-              xl: 3,
-              xxl: 4,
+              // sm: 2,
+              // md: 2,
+              // lg: 3,
+              // xl: 3,
+              // xxl: 4,
             }}
             dataSource={results}
             renderItem={(place) => (
@@ -202,7 +202,7 @@ export default function SearchResults() {
                         
                         <div className="flex items-center gap-2 text-sm text-gray-500">
                           <EnvironmentOutlined />
-                          <span className="line-clamp-1">{place.address}</span>
+                          {/* <span className="line-clamp-1">{place.address}</span> */}
                         </div>
 
                         {place.category && (

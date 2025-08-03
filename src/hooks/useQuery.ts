@@ -18,7 +18,7 @@ export type UseCustomPaginatedQueryConfigs<T> = UseQueryOptions<App.Services.Pag
 const useCustomPaginatedQuery = <T>(configs: UseCustomPaginatedQueryConfigs<T>) => {
   const { queryKey, queryFn, enabled, api, ...restConfigs } = configs;
 
-  const queryFnCustom = !queryFn ? queryFn : () => api.then((res) => res.data);
+  const queryFnCustom = queryFn ? queryFn : () => api.then((res) => res.data);
 
   const query = useQuery({ queryKey, queryFn: queryFnCustom, enabled, ...restConfigs });
   return query;

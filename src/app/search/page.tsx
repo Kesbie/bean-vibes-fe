@@ -2,8 +2,8 @@
 
 import React from "react";
 import { ClientLayout } from "@/components/shared";
-import SearchFilters from "@/components/search/SearchFilters";
-import SearchResults from "@/components/search/SearchResults";
+import SearchFilters from "@/components/search/search-filter";
+import SearchResults from "@/components/search/search-results";
 import QueryProvider from "@/components/providers/QueryProvider";
 
 export default function SearchPage() {

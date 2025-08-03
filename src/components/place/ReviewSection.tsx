@@ -11,7 +11,7 @@ const ReviewSection: React.FC<ReviewSectionProps> = () => {
   const reviews = [
     {
       id: 1,
-      userName: "Hiếu Nguyễn Thành",
+      userName: "Tuan Nguyen Minh",
       date: "09-11-2022",
       comment: "Quán cafe cực chill",
       likes: 0,

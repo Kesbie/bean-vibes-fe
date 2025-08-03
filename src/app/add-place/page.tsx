@@ -8,7 +8,7 @@ import PlaceForm from '@/components/places/PlaceForm';
 
 const { Title, Paragraph } = Typography;
 
-export default function ContributePlacePage() {
+export default function AddPlacePage() {
   const handleSuccess = () => {
     // Redirect to my places page after successful contribution
     window.location.href = '/my-places';

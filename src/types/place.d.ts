@@ -19,20 +19,25 @@ declare namespace App.Types.Place {
     password: string;
   }
 
-  interface PlaceResponse {
+  type PlaceResponse = Base.BaseResponse & {
     id: string;
     name: string;
     description: string;
-    address: string;
+    address: {
+      fullAddress: string;
+      district: string;
+      ward: string;
+      street: string;
+    };
     latitude?: number;
     longitude?: number;
     phone?: string;
     website?: string;
-    openingHours?: Record<string, any>;
-    categoryId: string;
-    category?: CategoryResponse;
+    categories: CategoryResponse[];
     photos?: string[];
     rating?: number;
+    price?: Price;
+    time?: Time;
     totalRatings?: number;
     totalReviews?: number;
     hotScore?: number;
@@ -51,8 +56,11 @@ declare namespace App.Types.Place {
     longitude?: number;
     phone?: string;
     website?: string;
-    openingHours?: Record<string, any>;
-    categoryId: string;
+    time?: Time;
+    price?: Price;
+    wifi?: Wifi;
+    social?: Social[];
+    categories: string[];
     photos?: string[];
   }
 
@@ -65,8 +73,11 @@ declare namespace App.Types.Place {
     longitude?: number;
     phone?: string;
     website?: string;
-    openingHours?: Record<string, any>;
-    categoryId?: string;
+    time?: Time;
+    price?: Price;
+    wifi?: Wifi;
+    social?: Social[];
+    categories?: string[];
     photos?: string[];
     status?: 'active' | 'inactive';
     isApproved?: boolean;

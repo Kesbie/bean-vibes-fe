@@ -8,6 +8,7 @@ import { placeService, reviewService } from '@/services';
 import ClientLayout from '@/components/shared/ClientLayout';
 import QueryProvider from '@/components/providers/QueryProvider';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -18,6 +19,8 @@ export default function WriteReviewPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlace, setSelectedPlace] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  console.log("hello")
 
   const { data: places, isLoading: searchingPlaces } = useQuery({
     queryKey: ['places', 'search', searchQuery],
@@ -133,7 +136,7 @@ export default function WriteReviewPage() {
                     <Card size="small" className="bg-gray-50">
                       <div className="flex items-start gap-3">
                         {selectedPlace.photos?.[0] && (
-                          <img
+                          <Image
                             src={selectedPlace.photos[0]}
                             alt={selectedPlace.name}
                             className="w-16 h-16 object-cover rounded"

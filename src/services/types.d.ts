@@ -1,8 +1,8 @@
 declare namespace App.Services {
-
   export type PaginatedFilters = {
     page?: number;
     limit?: number;
+    sortBy?: string;
   }
 
   export interface BaseService {
@@ -20,10 +20,17 @@ declare namespace App.Services {
     limit: number;
   }
 
+  export type BasePaginatedResponse<T> = {
+    code: number;
+    data?: PaginatedData<T>;
+    message: string;
+  }
 
-  export type BasePaginatedResponse<T> = PaginatedData<T>
-
-  export type BaseDataResponse<T> = T
+  export type BaseDataResponse<T> = {
+    code: number;
+    data?: T;
+    message: string;
+  }
 
   export type Response<T> = Promise<BaseDataResponse<T>>;
 

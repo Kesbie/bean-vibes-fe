@@ -6,6 +6,8 @@ declare namespace App.Types.Base {
   };
 
   type BaseFilter = {
-    
+    sortBy?: string,
+    limit?: number,
+    page?: number,
   }
 }

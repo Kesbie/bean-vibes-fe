@@ -14,7 +14,7 @@ import {
   PlusOutlined
 } from "@ant-design/icons";
 import { useAuth } from "@/components/providers/AuthProvider";
-import { Button, Dropdown, Avatar } from "antd";
+import { Button, Dropdown, Avatar, Typography } from "antd";
 
 const Header: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
@@ -28,7 +28,7 @@ const Header: React.FC = () => {
 
   const handleContributePlace = () => {
     if (isAuthenticated) {
-      router.push("/contribute-place");
+      router.push("/add-place");
     } else {
       router.push("/login");
     }
@@ -74,16 +74,13 @@ const Header: React.FC = () => {
   ];
 
   const navigationLinks = [
-    { href: "/", label: "Trang chủ" },
-    { href: "/search", label: "Khám phá" },
-    { href: "/search-advanced", label: "Tìm kiếm nâng cao" },
-    { href: "#", label: "Giới thiệu" },
-    { href: "#", label: "Liên hệ - Góp ý" }
+    { href: "/explore", label: "Khám phá" },
+    { href: "/add-place", label: "Đóng góp địa điểm" }
   ];
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className=" mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <div className="flex-shrink-0">
@@ -96,12 +93,12 @@ const Header: React.FC = () => {
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex space-x-8 ml-10 mr-auto">
             {navigationLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-gray-900 hover:text-red-600 transition-colors"
+                className="text-lg font-semibold text-gray-900 hover:text-red-600 transition-colors"
               >
                 {link.label}
               </Link>
@@ -110,16 +107,6 @@ const Header: React.FC = () => {
 
           {/* Action Buttons */}
           <div className="flex items-center space-x-4">
-            {/* Contribute Place Button */}
-            <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              className="bg-green-600 border-green-600 hover:bg-green-700 hover:border-green-700"
-              onClick={handleContributePlace}
-            >
-              Đóng góp địa điểm
-            </Button>
-
             {/* Write Review Button */}
             <Button
               type="primary"
@@ -127,7 +114,7 @@ const Header: React.FC = () => {
               className="bg-red-600 border-red-600 hover:bg-red-700 hover:border-red-700"
               onClick={() => {
                 if (isAuthenticated) {
-                  router.push("/write-review");
+                  router.push("/new-review");
                 } else {
                   router.push("/login");
                 }
@@ -139,7 +126,9 @@ const Header: React.FC = () => {
             {/* User Section */}
             {isAuthenticated ? (
               <Dropdown
-                menu={{ items: user?.role !== 'user' ? adminMenuItems : userMenuItems }}
+                menu={{
+                  items: user?.role !== "user" ? adminMenuItems : userMenuItems
+                }}
                 placement="bottomRight"
                 arrow
               >
@@ -186,17 +175,6 @@ const Header: React.FC = () => {
                   {link.label}
                 </Link>
               ))}
-              <Button
-                type="primary"
-                icon={<PlusOutlined />}
-                className="bg-green-600 border-green-600 hover:bg-green-700 hover:border-green-700 mx-4"
-                onClick={() => {
-                  handleContributePlace();
-                  setIsMobileMenuOpen(false);
-                }}
-              >
-                Đóng góp địa điểm
-              </Button>
             </nav>
           </div>
         )}

@@ -2,6 +2,7 @@ import axios, { InternalAxiosRequestConfig } from "axios";
 import appConfigs from "@/configs";
 import { localStorageService } from "./storages";
 import { refreshToken as authRefreshToken } from "./auth";
+import qs from "qs";
 
 // Utility function to check if current path is admin route
 const isAdminRoute = () => {
@@ -58,6 +59,9 @@ const axiosInstance = axios.create({
   baseURL: appConfigs.api.url,
   timeout: 10_000,
   validateStatus: (status) => status >= 200 && status < 600,
+  paramsSerializer: (params) => {
+    return qs.stringify(params, { arrayFormat: 'repeat' });
+  }
 })
 
 axiosInstance.interceptors.request.use(
