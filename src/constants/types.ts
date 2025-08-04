@@ -31,4 +31,20 @@ const SOCIAL_TYPES = {
   WEBSITE: 'website',
 } as const;
 
-export { RESTRICTED_WORD_TYPES, CATEGORY_TYPES, PLACE_STATUS, PLACE_APPROVAL_STATUS, SOCIAL_TYPES };
+const RATING_TYPES = {
+  LOCATION: 'location',
+  DRINK_QUALITY: 'drinkQuality',
+  SERVICE: 'service',
+  STAFF_ATTITUDE: 'staffAttitude',
+  PRICE: 'price',
+} as const;
+
+const RATE_QUALITY = {
+  POOR: 'poor',
+  AVERAGE: 'average',
+  NORMAL: 'normal',
+  GOOD: 'good',
+  EXCELLENT: 'excellent',
+} as const;
+
+export { RESTRICTED_WORD_TYPES, CATEGORY_TYPES, PLACE_STATUS, PLACE_APPROVAL_STATUS, SOCIAL_TYPES, RATING_TYPES, RATE_QUALITY };

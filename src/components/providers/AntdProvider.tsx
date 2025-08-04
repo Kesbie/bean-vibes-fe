@@ -13,7 +13,7 @@ export default function AntdProvider({ children }: AntdProviderProps) {
       theme={{
         algorithm: theme.defaultAlgorithm,
         token: {
-          colorPrimary: '#1890ff',
+          colorPrimary: '#e03',
           borderRadius: 6,
           fontFamily: 'var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
         },

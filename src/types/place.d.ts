@@ -29,23 +29,19 @@ declare namespace App.Types.Place {
       ward: string;
       street: string;
     };
-    latitude?: number;
-    longitude?: number;
-    phone?: string;
-    website?: string;
     categories: CategoryResponse[];
     photos?: string[];
     rating?: number;
     price?: Price;
     time?: Time;
+    wifi?: Wifi;
+    social?: Social[];
     totalRatings?: number;
     totalReviews?: number;
     hotScore?: number;
-    isApproved?: boolean;
+    approvalStatus?: 'pending' | 'approved' | 'rejected';
     isVerified?: boolean;
-    status?: 'active' | 'inactive' | 'pending';
-    createdAt: string;
-    updatedAt: string;
+    status?: 'active' | 'inactive';
   }
 
   interface PlaceCreate {

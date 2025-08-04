@@ -11,7 +11,7 @@ interface ClientLayoutProps {
 
 const ClientLayout: React.FC<ClientLayoutProps> = ({ children, className = "" }) => {
   return (
-    <div className={`min-h-screen bg-white ${className}`}>
+    <div className={`min-h-screen bg-gray-50 ${className}`}>
       <Header />
       <main>
         {children}

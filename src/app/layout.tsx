@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Quicksand, Open_Sans } from "next/font/google";
 import "@/styles/globals.css";
 import Providers from "@/components/providers/Providers";
+import RouteLoadingBar from "@/components/shared/RouteLoadingBar";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -30,6 +31,7 @@ export default function RootLayout({
       <body
         className={`${quicksand.variable} ${openSans.variable} font-quicksand antialiased bg-gray-50`}
       >
+        <RouteLoadingBar />
         <Providers>{children}</Providers>
       </body>
     </html>

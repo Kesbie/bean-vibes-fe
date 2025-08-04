@@ -13,10 +13,8 @@ export const useHomeData = () => {
     error: featuredError
   } = useQuery({
     queryKey: ['featured-places', searchQuery, selectedCategory],
-    queryFn: () => placeService.getPublicPlaces({
+    queryFn: () => placeService.getTrendingPlaces({
       limit: 8,
-      ...(searchQuery && { search: searchQuery }),
-      ...(selectedCategory && { categoryId: selectedCategory })
     }),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });

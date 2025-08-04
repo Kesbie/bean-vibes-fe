@@ -5,13 +5,20 @@ import { StarFilled, StarOutlined } from "@ant-design/icons";
 import { useHomeData } from "@/hooks/useHomeData";
 import { useRouter } from "next/navigation";
 import { Spin, Empty } from "antd";
+import { placeService } from "@/services";
+import { useQuery } from "@tanstack/react-query";
 
 const FeaturedLocationsSection: React.FC = () => {
-  const { featuredPlaces, isLoadingFeatured, featuredError } = useHomeData();
-
-  console.log("======",  featuredPlaces)
-
   const router = useRouter();
+
+  const { data: places, isLoading } = useQuery({
+    queryKey: ["places"],
+    queryFn: () => placeService.getTrendingPlaces({
+      limit: 8,
+    }).then((res) => res.data.results),
+  });
+
+  console.log("======",  places)
 
   const renderStars = (rating: number) => {
     const stars = [];
@@ -44,7 +51,7 @@ const FeaturedLocationsSection: React.FC = () => {
     return `${time.open} - ${time.close}`;
   };
 
-  if (isLoadingFeatured) {
+  if (isLoading) {
     return (
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -61,7 +68,7 @@ const FeaturedLocationsSection: React.FC = () => {
     );
   }
 
-  if (featuredError) {
+  if (places.length === 0) {
     return (
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -89,9 +96,9 @@ const FeaturedLocationsSection: React.FC = () => {
         </div>
 
         {/* Cafe Cards Grid */}
-        {featuredPlaces.length > 0 ? (
+        {places.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredPlaces.map((place) => (
+            {places.map((place) => (
               <div
                 key={place.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"

@@ -1,331 +1,241 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button, Card, Table, Tag, Space, Modal, message, Popconfirm, Input, Select, Switch } from 'antd';
-import { EyeOutlined, EditOutlined, DeleteOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { placeService } from '@/services';
-import { useRouter } from 'next/navigation';
-import ClientLayout from '@/components/shared/ClientLayout';
-import QueryProvider from '@/components/providers/QueryProvider';
-import PlaceForm from '@/components/places/PlaceForm';
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { placeService } from "@/services";
+import { Button } from "antd";
+import { columns } from "./columns";
+import { AdminContentHeader } from "@/components/admin-content-header";
+import {
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  PlusOutlined
+} from "@ant-design/icons";
+import FormAdvance from "@/components/form-advance";
+import {
+  restrictedWordFormElement,
+  restrictedWordFormElementEdit
+} from "@/components/form-elements/restrictedWord";
+// import { useAuth } from "@/components/providers/AuthProvider";
+import { elementTypes } from "@/components";
+import Table from "@/components/table";
+import { useCustomMutation } from "@/hooks/useQuery";
+import { useConfirmModal } from "@/hooks/useConfirm";
+import { useAuth } from "@/components/providers/AuthProvider";
 
-const { Search } = Input;
-const { Option } = Select;
+const RestrictedWordsPage = () => {
+  const { isAdmin } = useAuth();
 
-export default function AdminPlacesPage() {
-  const [searchText, setSearchText] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('');
-  const [approvalFilter, setApprovalFilter] = useState<string>('');
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [editingPlace, setEditingPlace] = useState<App.Types.Place.PlaceResponse | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  
-  const router = useRouter();
-  const queryClient = useQueryClient();
-
-  // Fetch admin places
-  const { data: placesData, isLoading } = useQuery({
-    queryKey: ['admin-places', searchText, statusFilter, approvalFilter, currentPage, pageSize],
-    queryFn: () => placeService.getPlacesAdmin({
-      search: searchText || undefined,
-      status: statusFilter || undefined,
-      isApproved: approvalFilter === 'approved' ? true : approvalFilter === 'pending' ? false : undefined,
-      page: currentPage,
-      limit: pageSize
-    }),
-    staleTime: 5 * 60 * 1000,
+  const [filters, setFilters] = React.useState({
+    page: 1,
+    limit: 10
   });
 
-  // Delete place mutation
-  const deleteMutation = useMutation({
-    mutationFn: placeService.deleteAdminPlace,
+  const { data: places, refetch } = useQuery({
+    queryKey: ["places", filters.page, filters.limit],
+    queryFn: () => placeService.getPlacesAdmin(filters).then((res) => res.data),
+    enabled: isAdmin
+  });
+
+  const {
+    showDeleteConfirm,
+    showConfirm,
+    showRejectConfirm,
+    showApproveConfirm
+  } = useConfirmModal();
+
+  const formRef = React.useRef<App.Components.FormAdvance.FormAdvanceRef>(null);
+  const formRefEdit =
+    React.useRef<App.Components.FormAdvance.FormAdvanceRef>(null);
+
+  const { mutate: addRestrictedWord } = useCustomMutation({
+    mutationFn: (payload: App.Types.Place.PlaceCreate) =>
+      placeService.addPlace(payload),
     onSuccess: () => {
-      message.success('Đã xóa địa điểm thành công');
-      queryClient.invalidateQueries({ queryKey: ['admin-places'] });
+      formRef.current?.done();
+      refetch();
     },
-    onError: (error: any) => {
-      message.error(error?.response?.data?.message || 'Có lỗi xảy ra khi xóa địa điểm');
+    onError: () => {
+      formRef.current?.fail();
+    },
+    messageConfigs: {
+      successMessage: "Thêm địa điểm thành công",
+      errorMessage: "Thêm địa điểm thất bại"
     }
   });
 
-  // Approve/Reject place mutation
-  const approvalMutation = useMutation({
-    mutationFn: ({ id, isApproved, reason }: { id: string; isApproved: boolean; reason?: string }) =>
-      placeService.approvePlace(id, isApproved, reason),
-    onSuccess: (_, variables) => {
-      message.success(
-        variables.isApproved 
-          ? 'Đã duyệt địa điểm thành công' 
-          : 'Đã từ chối địa điểm thành công'
-      );
-      queryClient.invalidateQueries({ queryKey: ['admin-places'] });
+  const { mutate: updatePlace } = useCustomMutation({
+    mutationFn: (payload: App.Types.Place.PlaceResponse) =>
+      placeService.updatePlace(payload),
+    onSuccess: () => {
+      formRefEdit.current?.done();
+      refetch();
     },
-    onError: (error: any) => {
-      message.error(error?.response?.data?.message || 'Có lỗi xảy ra khi cập nhật trạng thái');
+    onError: () => {
+      formRefEdit.current?.fail();
+    },
+    messageConfigs: {
+      successMessage: "Cập nhật địa điểm thành công",
+      errorMessage: "Cập nhật địa điểm thất bại"
     }
   });
 
-  const handleDelete = (id: string) => {
-    deleteMutation.mutate(id);
-  };
+  const { mutate: deleteRestrictedWord } = useCustomMutation({
+    mutationFn: (id: string) => placeService.deletePlace(id),
+    onSuccess: () => {
+      refetch();
+    },
+    messageConfigs: {
+      successMessage: "Xóa địa điểm thành công",
+      errorMessage: "Xóa địa điểm thất bại"
+    }
+  });
 
-  const handleEdit = (place: App.Types.Place.PlaceResponse) => {
-    setEditingPlace(place);
-    setIsModalVisible(true);
-  };
-
-  const handleView = (id: string) => {
-    router.push(`/place/${id}`);
-  };
-
-  const handleApproval = (place: App.Types.Place.PlaceResponse, isApproved: boolean) => {
-    Modal.confirm({
-      title: isApproved ? 'Duyệt địa điểm' : 'Từ chối địa điểm',
-      content: (
-        <div>
-          <p>{isApproved ? 'Bạn có chắc chắn muốn duyệt địa điểm này?' : 'Bạn có chắc chắn muốn từ chối địa điểm này?'}</p>
-          {!isApproved && (
-            <Input.TextArea
-              placeholder="Lý do từ chối (tùy chọn)"
-              rows={3}
-              className="mt-2"
-              id="rejection-reason"
-            />
-          )}
-        </div>
-      ),
-      onOk: () => {
-        const reason = !isApproved ? (document.getElementById('rejection-reason') as HTMLTextAreaElement)?.value : undefined;
-        approvalMutation.mutate({ id: place.id, isApproved, reason });
+  const handleFinish: App.Components.FormAdvance.OnFinishEvent<App.Types.RestrictedWord.RestrictedWordCreate> =
+    React.useCallback(
+      (info) => {
+        const { values, api } = info;
+        api.loading();
+        addRestrictedWord(values);
       },
-      okText: isApproved ? 'Duyệt' : 'Từ chối',
-      cancelText: 'Hủy',
-      okButtonProps: { 
-        type: 'primary',
-        danger: !isApproved 
-      }
-    });
-  };
+      [addRestrictedWord]
+    );
 
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-    setEditingPlace(null);
-  };
+  const handleFinishEdit: App.Components.FormAdvance.OnFinishEvent<App.Types.RestrictedWord.RestrictedWordUpdate> =
+    React.useCallback(
+      (info) => {
+        const { values, api } = info;
+        api.loading();
+        console.log(values);
 
-  const handleFormSuccess = () => {
-    handleModalClose();
-    queryClient.invalidateQueries({ queryKey: ['admin-places'] });
-  };
-
-  const columns = [
-    {
-      title: 'Tên địa điểm',
-      dataIndex: 'name',
-      key: 'name',
-      render: (text: string) => <span className="font-medium">{text}</span>,
-    },
-    {
-      title: 'Người đóng góp',
-      dataIndex: 'createdBy',
-      key: 'createdBy',
-      render: (user: App.Types.User.UserResponse) => (
-        <span className="text-gray-600">{user?.name || 'Không xác định'}</span>
-      ),
-    },
-    {
-      title: 'Địa chỉ',
-      dataIndex: 'address',
-      key: 'address',
-      render: (text: string) => <span className="text-gray-600">{text}</span>,
-    },
-    {
-      title: 'Danh mục',
-      dataIndex: 'category',
-      key: 'category',
-      render: (category: App.Types.Category.CategoryResponse) => (
-        <Tag color="blue">{category?.name}</Tag>
-      ),
-    },
-    {
-      title: 'Trạng thái',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string, record: App.Types.Place.PlaceResponse) => {
-        let color = 'default';
-        let text = 'Không xác định';
-        
-        if (record.isApproved === false) {
-          color = 'orange';
-          text = 'Chờ duyệt';
-        } else if (record.isApproved === true) {
-          color = 'green';
-          text = 'Đã duyệt';
-        } else if (status === 'active') {
-          color = 'green';
-          text = 'Hoạt động';
-        } else if (status === 'inactive') {
-          color = 'red';
-          text = 'Không hoạt động';
-        }
-        
-        return <Tag color={color}>{text}</Tag>;
+        updatePlace(values);
       },
+      [updatePlace]
+    );
+
+  const handleDelete = React.useCallback(
+    (value: App.Types.Place.PlaceResponse) => {
+      showDeleteConfirm(value.name, () => {
+        deleteRestrictedWord(value.id);
+      });
     },
-    {
-      title: 'Đánh giá',
-      dataIndex: 'rating',
-      key: 'rating',
-      render: (rating: number, record: App.Types.Place.PlaceResponse) => (
-        <span>
-          {rating ? `${rating.toFixed(1)} ⭐` : 'Chưa có đánh giá'}
-        </span>
-      ),
+    [showDeleteConfirm, deleteRestrictedWord]
+  );
+
+  const handleEdit = React.useCallback(
+    (values: App.Types.Place.PlaceResponse) => {
+      formRefEdit.current?.edit(values);
     },
-    {
-      title: 'Ngày tạo',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
-      render: (date: string) => (
-        <span className="text-gray-600">
-          {new Date(date).toLocaleDateString('vi-VN')}
-        </span>
-      ),
+    []
+  );
+
+  const handleApprove = React.useCallback(
+    (record: App.Types.Place.PlaceResponse) => {
+      showApproveConfirm(record.name, () => {
+        // approvePlace(record.id);
+      });
     },
-    {
-      title: 'Thao tác',
-      key: 'actions',
-      render: (_, record: App.Types.Place.PlaceResponse) => (
-        <Space>
+    [showApproveConfirm]
+  );
+
+  const handleReject = React.useCallback(
+    (record: App.Types.Place.PlaceResponse) => {
+      // showRejectConfirm(record.name, () => {
+      //   rejectPlace(record.id);
+      // });
+    },
+    [showRejectConfirm]
+  );
+
+  const renderAction = React.useCallback(
+    (record: App.Types.Place.PlaceResponse) => {
+      return (
+        <>
           <Button
-            type="text"
-            icon={<EyeOutlined />}
-            onClick={() => handleView(record.id)}
-            title="Xem chi tiết"
+            danger
+            icon={<DeleteOutlined />}
+            type="link"
+            onClick={() => handleDelete(record)}
           />
           <Button
-            type="text"
             icon={<EditOutlined />}
+            type="link"
             onClick={() => handleEdit(record)}
-            title="Chỉnh sửa"
           />
-          {record.isApproved === false && (
-            <Button
-              type="text"
-              icon={<CheckOutlined />}
-              onClick={() => handleApproval(record, true)}
-              title="Duyệt"
-              className="text-green-600"
-            />
+          {record.approvalStatus === "pending" && (
+            <>
+              <Button
+                icon={<CheckCircleOutlined />}
+                type="link"
+                onClick={() => handleApprove(record)}
+              />
+              <Button
+                icon={<CloseCircleOutlined />}
+                type="link"
+                onClick={() => handleReject(record)}
+              />
+            </>
           )}
-          {record.isApproved === false && (
-            <Button
-              type="text"
-              icon={<CloseOutlined />}
-              onClick={() => handleApproval(record, false)}
-              title="Từ chối"
-              className="text-red-600"
-            />
-          )}
-          <Popconfirm
-            title="Bạn có chắc chắn muốn xóa địa điểm này?"
-            description="Hành động này không thể hoàn tác."
-            onConfirm={() => handleDelete(record.id)}
-            okText="Có"
-            cancelText="Không"
-          >
-            <Button
-              type="text"
-              danger
-              icon={<DeleteOutlined />}
-              title="Xóa"
-            />
-          </Popconfirm>
-        </Space>
-      ),
+        </>
+      );
     },
-  ];
+    [handleEdit, handleDelete]
+  );
+
+  console.log(places);
 
   return (
-    <QueryProvider>
-      <ClientLayout>
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Quản lý địa điểm</h1>
-            <p className="text-gray-600">Quản lý và duyệt các địa điểm được đóng góp</p>
-          </div>
-
-          <Card>
-            <div className="flex justify-between items-center mb-4">
-              <div className="flex gap-4 flex-1">
-                <Search
-                  placeholder="Tìm kiếm địa điểm..."
-                  value={searchText}
-                  onChange={(e) => setSearchText(e.target.value)}
-                  style={{ width: 300 }}
-                  allowClear
-                />
-                <Select
-                  placeholder="Lọc theo trạng thái"
-                  value={statusFilter}
-                  onChange={setStatusFilter}
-                  style={{ width: 150 }}
-                  allowClear
-                >
-                  <Option value="active">Hoạt động</Option>
-                  <Option value="inactive">Không hoạt động</Option>
-                </Select>
-                <Select
-                  placeholder="Lọc theo duyệt"
-                  value={approvalFilter}
-                  onChange={setApprovalFilter}
-                  style={{ width: 150 }}
-                  allowClear
-                >
-                  <Option value="approved">Đã duyệt</Option>
-                  <Option value="pending">Chờ duyệt</Option>
-                </Select>
-              </div>
-            </div>
-
-            <Table
-              columns={columns}
-              dataSource={placesData?.data?.results || []}
-              loading={isLoading}
-              rowKey="id"
-              pagination={{
-                current: currentPage,
-                pageSize: pageSize,
-                total: placesData?.data?.totalResults || 0,
-                onChange: (page, size) => {
-                  setCurrentPage(page);
-                  setPageSize(size);
-                },
-                showSizeChanger: true,
-                showQuickJumper: true,
-                showTotal: (total, range) =>
-                  `${range[0]}-${range[1]} của ${total} địa điểm`,
-              }}
-            />
-          </Card>
-
-          <Modal
-            title={editingPlace ? 'Chỉnh sửa địa điểm' : 'Thêm địa điểm mới'}
-            open={isModalVisible}
-            onCancel={handleModalClose}
-            footer={null}
-            width={800}
-            destroyOnClose
+    <div className="flex flex-col h-full">
+      <AdminContentHeader
+        title="Địa điểm"
+        description="Quản lý các quán cafe tại Hà Nội"
+        buttons={
+          <Button
+            type="primary"
+            onClick={() => {
+              formRef.current?.show();
+            }}
           >
-            <PlaceForm
-              place={editingPlace}
-              onSuccess={handleFormSuccess}
-              onCancel={handleModalClose}
-            />
-          </Modal>
-        </div>
-      </ClientLayout>
-    </QueryProvider>
+            <PlusOutlined />
+            Thêm địa điểm
+          </Button>
+        }
+      />
+      <Table<App.Types.Place.PlaceResponse>
+        dataSource={places?.results || []}
+        columns={columns}
+        renderAction={renderAction}
+        pagination={{
+          pageSize: 10,
+          current: filters.page,
+          total: places?.totalResults,
+          onChange: (page) => {
+            setFilters({ ...filters, page });
+          }
+        }}
+      />
+      <FormAdvance
+        modalProps={{
+          title: "Thêm địa điểm"
+        }}
+        elements={restrictedWordFormElement}
+        elementTypes={elementTypes}
+        ref={formRef}
+        onFinish={handleFinish}
+      />
+      <FormAdvance
+        modalProps={{
+          title: "Sửa địa điểm"
+        }}
+        elements={restrictedWordFormElementEdit}
+        elementTypes={elementTypes}
+        ref={formRefEdit}
+        onFinish={handleFinishEdit}
+      />
+    </div>
   );
-}
+};
+
+export default RestrictedWordsPage;

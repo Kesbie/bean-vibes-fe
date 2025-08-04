@@ -20,7 +20,7 @@ export default function Home() {
       <ClientLayout>
         <HeroSection />
         <PurposeSection />
-        <CategoryFilter />
+        {/* <CategoryFilter /> */}
         {/* <SearchResults /> */}
         {/* <StatsSection /> */}
         <NearbyAreasSection />

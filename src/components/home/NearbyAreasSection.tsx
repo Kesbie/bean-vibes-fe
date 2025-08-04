@@ -4,10 +4,17 @@ import React from "react";
 import { useHomeData } from "@/hooks/useHomeData";
 import { useRouter } from "next/navigation";
 import { Spin, Empty } from "antd";
+import { categoryService } from "@/services";
+import { useQuery } from "@tanstack/react-query";
 
 const NearbyAreasSection: React.FC = () => {
   const { nearbyAreas, isLoadingAreas, areasError } = useHomeData();
   const router = useRouter();
+
+  const { data: regions } = useQuery({
+    queryKey: ["regions"],
+    queryFn: () => categoryService.getCategories({ type: "region" }).then((res) => res.data.results),
+  });
 
   const handleAreaClick = (place: any) => {
     // Navigate to search with district filter
@@ -95,30 +102,30 @@ const NearbyAreasSection: React.FC = () => {
         </div>
 
         {/* Area Cards */}
-        {districts.length > 0 ? (
+        {regions?.length > 0 ? (
           <>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-              {districts.map((district, index) => (
+              {regions.map((region, index) => (
                 <div
-                  key={district.name}
+                  key={region.name}
                   className="group cursor-pointer transform transition-transform hover:scale-105"
-                  onClick={() => router.push(`/search?district=${encodeURIComponent(district.name)}`)}
+                  onClick={() => router.push(`/search?district=${encodeURIComponent(region.name)}`)}
                 >
                   <div className="bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="aspect-square relative">
                       <img
-                        src={district.image}
-                        alt={district.name}
+                        src={region.thumbnail}
+                        alt={region.name}
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all"></div>
                     </div>
                     <div className="p-4 text-center">
                       <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                        {district.name}
+                        {region.name}
                       </h3>
                       <p className="text-sm text-gray-600">
-                        {district.placeCount} quán cafe
+                        {region.placeCount} quán cafe
                       </p>
                     </div>
                   </div>
@@ -128,7 +135,7 @@ const NearbyAreasSection: React.FC = () => {
 
             {/* Pagination Dots */}
             <div className="flex justify-center space-x-2">
-              {districts.map((_, index) => (
+              {regions.map((_, index) => (
                 <div
                   key={index}
                   className={`w-3 h-3 rounded-full ${

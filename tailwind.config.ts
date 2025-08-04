@@ -13,6 +13,7 @@ const config: Config = {
         quicksand: ["var(--font-quicksand)", "var(--font-open-sans)", "sans-serif"],
       },
       colors: {
+        primary: "#e03",
         background: "var(--background)",
         foreground: "var(--foreground)",
         red: {
@@ -28,6 +29,15 @@ const config: Config = {
           900: '#7f1d1d',
         },
       },
+      keyframes: {
+        loading: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' }
+        }
+      },
+      animation: {
+        loading: 'loading 1s ease-in-out infinite'
+      }
     },
   },
   plugins: [],

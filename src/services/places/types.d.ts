@@ -1,7 +1,7 @@
 declare namespace App.Services.PlacesService {
 
   type placeFilters = PaginatedFilters & {
-    categories?: string[];
+    category?: string[];
     name?: string;
   }
 
@@ -28,7 +28,7 @@ declare namespace App.Services.PlacesService {
   
   // Search APIs
   type searchPlaces = (filters?: PaginatedFilters) => PaginatedResponse<App.Types.Places.PlacesResponse>;
-  type getTrendingPlaces = (filters?: PaginatedFilters) => Response<App.Types.Places.PlacesResponse[]>;
+  type getTrendingPlaces = (filters?: PaginatedFilters) => PaginatedResponse<App.Types.Places.PlacesResponse>;
   type getHotPlacesWeekly = (filters?: PaginatedFilters) => Response<App.Types.Places.PlacesResponse[]>;
   type getVerifiedPlaces = (filters?: PaginatedFilters) => PaginatedResponse<App.Types.Places.PlacesResponse>;
   type getPlacesByCategory = (categoryId: string, filters?: PaginatedFilters) => PaginatedResponse<App.Types.Places.PlacesResponse>;
