@@ -1,6 +1,11 @@
 'use client';
 
 import React from "react";
+import { Navigation, Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/pagination";
+import "swiper/css/navigation";
 
 const PurposeSection: React.FC = () => {
   const purposes = [
@@ -40,46 +45,37 @@ const PurposeSection: React.FC = () => {
           </h2>
         </div>
 
-        {/* Purpose Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <Swiper
+          pagination={{
+            dynamicBullets: true,
+          }}
+          navigation={true}
+          loop={true}
+          spaceBetween={20}
+          slidesPerView={3}
+          modules={[Pagination, Navigation]}
+          className="needs-section-swiper"
+        >
           {purposes.map((purpose) => (
-            <div
+            <SwiperSlide
               key={purpose.id}
-              className="group cursor-pointer transform transition-transform hover:scale-105"
+              className="relative rounded-lg overflow-hidden group"
             >
-              <div className="bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="aspect-square relative">
-                  <img
-                    src={purpose.image}
-                    alt={purpose.title}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-black bg-opacity-20 group-hover:bg-opacity-30 transition-all"></div>
-                </div>
-                <div className="p-4 text-center">
-                  <h3 className="text-lg font-semibold text-gray-900">
+              {/* <a href="#" className="bg-pink-200 opacity-50 absolute z-10 top-0 left-0 w-full h-full"></a> */}
+              <div className="relative bg-black">
+                <img src={purpose.image} alt={purpose.title} className="w-full h-full object-cover aspect-[16/9] group-hover:scale-105 opacity-50 transition-all duration-300" />
+                <div className="p-4 text-center absolute top-1/2 -translate-y-1/2 left-0 w-full z-[1]">
+                  <h3 className="text-2xl font-bold text-white">
                     {purpose.title}
                   </h3>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-md font-semibold text-white mt-1">
                     {purpose.description}
                   </p>
                 </div>
               </div>
-            </div>
+            </SwiperSlide>
           ))}
-        </div>
-
-        {/* Pagination Dots */}
-        <div className="flex justify-center space-x-2">
-          {[1, 2, 3, 4].map((dot) => (
-            <div
-              key={dot}
-              className={`w-3 h-3 rounded-full ${
-                dot === 1 ? 'bg-blue-600' : 'bg-gray-300'
-              }`}
-            ></div>
-          ))}
-        </div>
+        </Swiper>
       </div>
     </section>
   );
