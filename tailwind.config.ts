@@ -37,6 +37,11 @@ const config: Config = {
       },
       animation: {
         loading: 'loading 1s ease-in-out infinite'
+      },
+      aspectRatio: {
+        '1/1': '1 / 1',
+        '16/9': '16 / 9',
+        '9/16': '9 / 16',
       }
     },
   },

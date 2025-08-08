@@ -29,3 +29,30 @@ body {
     text-wrap: balance;
   }
 }
+
+.needs-section-swiper {
+  @apply !pb-[40px] !ml-[-15px] !pl-[15px] !pr-[15px] !mr-[-15px];
+}
+
+.needs-section-swiper .swiper-button-prev,
+.needs-section-swiper .swiper-button-next {
+  @apply bg-white w-[40px] h-[40px] rounded-full text-[30px] translate-y-[-20px];
+}
+
+.needs-section-swiper .swiper-button-prev {
+  @apply left-0;
+}
+
+.needs-section-swiper .swiper-button-next {
+  @apply right-0;
+}
+
+.needs-section-swiper .swiper-button-prev,
+.needs-section-swiper .swiper-button-next {
+  @apply bg-white w-[40px] h-[40px] rounded-full text-[30px] shadow-lg;
+}
+
+.needs-section-swiper .swiper-button-prev::after,
+.needs-section-swiper .swiper-button-next::after {
+  @apply text-[20px] text-black font-bold;
+}
