@@ -1,4 +1,4 @@
-import { CATEGORY_TYPES, PLACE_APPROVAL_STATUS, PLACE_STATUS, RESTRICTED_WORD_TYPES, SOCIAL_TYPES, RATING_TYPES, RATE_QUALITY } from "./types";
+import { CATEGORY_TYPES, PLACE_APPROVAL_STATUS, PLACE_STATUS, RESTRICTED_WORD_TYPES, SOCIAL_TYPES, RATING_TYPES, RATE_QUALITY, OPEN_STATUS, REPORT_STATUS, REPORT_TYPES, REPORT_RESOLVED_ACTIONS } from "./types";
 
 const RestrictedWordTypesMap = new Map<string, { title: string, color: string }>([
   [RESTRICTED_WORD_TYPES.BAN, { title: "Cấm", color: "red" }],
@@ -49,4 +49,26 @@ const RateQualityMap = new Map<number, { title: string, color: string }>([
   [5, { title: "Tuyệt vời", color: "purple" }],
 ]);
 
-export { RestrictedWordTypesMap, CategoryTypesMap, PlaceStatusMap, PlaceApprovalStatusMap, SocialTypesMap, RatingTypesMap, RateQualityMap };
+const OpenStatusMap = new Map<string, { title: string, color: string }>([
+  [OPEN_STATUS.OPEN, { title: "Đang mở cửa", color: "green" }],
+  [OPEN_STATUS.CLOSE, { title: "Đã đóng cửa", color: "red" }],
+]);
+
+const ReportStatusMap = new Map<string, { title: string, color: string }>([
+  [REPORT_STATUS.PENDING, { title: "Chờ xử lý", color: "yellow" }],
+  [REPORT_STATUS.RESOLVED, { title: "Đã xử lý", color: "green" }],
+]);
+
+const ReportTypesMap = new Map<string, { title: string, color: string }>([
+  [REPORT_TYPES.REVIEW, { title: "Đánh giá", color: "red" }],
+  [REPORT_TYPES.COMMENT, { title: "Bình luận", color: "yellow" }],
+]);
+
+const ReportResolvedActionsMap = new Map<string, { title: string, color: string }>([
+  [REPORT_RESOLVED_ACTIONS.DELETE, { title: "Xóa nội dung", color: "red" }],
+  [REPORT_RESOLVED_ACTIONS.HIDE, { title: "Ẩn nội dung", color: "gray" }],
+  [REPORT_RESOLVED_ACTIONS.BAN_USER, { title: "Cấm người dùng", color: "red" }],
+  [REPORT_RESOLVED_ACTIONS.WARN_USER, { title: "Cảnh báo người dùng", color: "yellow" }],
+]);
+
+export { RestrictedWordTypesMap, CategoryTypesMap, PlaceStatusMap, PlaceApprovalStatusMap, SocialTypesMap, RatingTypesMap, RateQualityMap, OpenStatusMap, ReportStatusMap, ReportTypesMap, ReportResolvedActionsMap };

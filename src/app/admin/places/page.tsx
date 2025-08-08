@@ -3,7 +3,7 @@
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { placeService } from "@/services";
-import { Button } from "antd";
+import { Button, Image, Typography } from "antd";
 import { columns } from "./columns";
 import { AdminContentHeader } from "@/components/admin-content-header";
 import {
@@ -24,18 +24,29 @@ import Table from "@/components/table";
 import { useCustomMutation } from "@/hooks/useQuery";
 import { useConfirmModal } from "@/hooks/useConfirm";
 import { useAuth } from "@/components/providers/AuthProvider";
+import { PLACE_APPROVAL_STATUS } from "@/constants";
+import Modal from "@/components/modals";
+import { omit } from "lodash";
+
 
 const RestrictedWordsPage = () => {
   const { isAdmin } = useAuth();
 
+  const descriptionModalRef = React.useRef<App.Components.Modal.ModalRef>(null);
+  const photosModalRef = React.useRef<App.Components.Modal.ModalRef>(null);
+
+  const [description, setDescription] = React.useState<string>("");
+  const [photos, setPhotos] = React.useState<App.Types.Place.Photo[]>([]);
+
   const [filters, setFilters] = React.useState({
     page: 1,
-    limit: 10
+    limit: 10,
+    sortBy: "approvalStatus"
   });
 
   const { data: places, refetch } = useQuery({
     queryKey: ["places", filters.page, filters.limit],
-    queryFn: () => placeService.getPlacesAdmin(filters).then((res) => res.data),
+    queryFn: () => placeService.getAdminPlaces(filters).then((res) => res.data),
     enabled: isAdmin
   });
 
@@ -93,6 +104,35 @@ const RestrictedWordsPage = () => {
     }
   });
 
+  const { mutate: approvePlace } = useCustomMutation({
+    mutationFn: (id: string) =>
+      placeService.changePlaceApprovalStatus(id, {
+        status: PLACE_APPROVAL_STATUS.APPROVED
+      }),
+    onSuccess: () => {
+      refetch();
+    },
+    messageConfigs: {
+        successMessage: "Duyệt địa điểm thành công",
+        errorMessage: "Duyệt địa điểm thất bại"
+    }
+  });
+
+  const { mutate: rejectPlace } = useCustomMutation({
+    mutationFn: (payload: App.Types.Place.PlaceChangeApprovalStatusUpdate) =>
+      placeService.changePlaceApprovalStatus(payload.id, {
+        status: PLACE_APPROVAL_STATUS.REJECTED,
+        reason: payload.reason
+      }),
+    onSuccess: () => {
+      refetch();
+    },
+    messageConfigs: {
+      successMessage: "Từ chối địa điểm thành công",
+      errorMessage: "Từ chối địa điểm thất bại"
+    }
+  });
+
   const handleFinish: App.Components.FormAdvance.OnFinishEvent<App.Types.RestrictedWord.RestrictedWordCreate> =
     React.useCallback(
       (info) => {
@@ -134,23 +174,27 @@ const RestrictedWordsPage = () => {
   const handleApprove = React.useCallback(
     (record: App.Types.Place.PlaceResponse) => {
       showApproveConfirm(record.name, () => {
-        // approvePlace(record.id);
+        approvePlace(record.id);
       });
     },
-    [showApproveConfirm]
+    [showApproveConfirm, approvePlace]
   );
 
   const handleReject = React.useCallback(
     (record: App.Types.Place.PlaceResponse) => {
-      // showRejectConfirm(record.name, () => {
-      //   rejectPlace(record.id);
-      // });
+      showRejectConfirm(record.name, (reason) => {
+        rejectPlace({
+          id: record.id,
+          reason
+        });
+      });
     },
-    [showRejectConfirm]
+    [showRejectConfirm, rejectPlace]
   );
 
   const renderAction = React.useCallback(
     (record: App.Types.Place.PlaceResponse) => {
+      console.log(record);
       return (
         <>
           <Button
@@ -184,6 +228,18 @@ const RestrictedWordsPage = () => {
     [handleEdit, handleDelete]
   );
 
+  const handleShowDescription = React.useCallback((description: string) => {
+    setDescription(description);
+    descriptionModalRef.current?.show();
+  }, []);
+
+  const handleShowPhotos = React.useCallback(
+    (photos: App.Types.Place.Photo[]) => {
+      setPhotos(photos);
+      photosModalRef.current?.show();
+    },
+    []
+  );
   console.log(places);
 
   return (
@@ -205,7 +261,7 @@ const RestrictedWordsPage = () => {
       />
       <Table<App.Types.Place.PlaceResponse>
         dataSource={places?.results || []}
-        columns={columns}
+        columns={columns(handleShowDescription, handleShowPhotos)}
         renderAction={renderAction}
         pagination={{
           pageSize: 10,
@@ -234,6 +290,31 @@ const RestrictedWordsPage = () => {
         ref={formRefEdit}
         onFinish={handleFinishEdit}
       />
+      <Modal ref={descriptionModalRef} title="Nội dung">
+        <Typography.Text>{description}</Typography.Text>
+      </Modal>
+      <Modal ref={photosModalRef} title="Ảnh">
+        <div className="flex flex-wrap ">
+          <Image.PreviewGroup
+            preview={{
+              onChange: (current, prev) =>
+                console.log(`current index: ${current}, prev index: ${prev}`)
+            }}
+          >
+            {photos.map((photo, index) => (
+              <Image
+                className="rounded-lg mx-1"
+                width={100}
+                height={100}
+                style={{ objectFit: "cover" }}
+                src={photo.url}
+                key={index}
+                alt={`ảnh ${index}`}
+              />
+            ))}
+          </Image.PreviewGroup>
+        </div>
+      </Modal>
     </div>
   );
 };

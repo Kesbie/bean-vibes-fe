@@ -1,18 +1,24 @@
 import { CategoryTypesMap, PlaceApprovalStatusMap, PlaceStatusMap } from "@/constants";
-import { Tag } from "antd";
+import { Button, Modal, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
 import { nanoid } from "nanoid";
 import { TruncatedText } from "@/components/shared";
+import Link from "next/link";
+import { useState } from "react";
 
-const columns: ColumnsType<App.Types.Place.PlaceResponse> = [
+const columns = (onShowDescription, onShowPhotos): ColumnsType<App.Types.Place.PlaceResponse> => ([
   {
     title: "Tên quán",
     dataIndex: "name",
     width: 250,
     key: "name",
     fixed: "left",
-    render: (_, { name }) => {
-      return <TruncatedText text={name} maxWidth={250} />;
+    render: (_, { name, slug }) => {
+      return (
+        <Link href={`/place/${slug}`} target="_blank">
+          <TruncatedText text={name} maxWidth={250} />
+        </Link>
+    );
     }
   },
   {
@@ -28,7 +34,6 @@ const columns: ColumnsType<App.Types.Place.PlaceResponse> = [
         </Tag>
       );
     },
-    
   },
   {
     title: "Trạng thái",
@@ -59,39 +64,52 @@ const columns: ColumnsType<App.Types.Place.PlaceResponse> = [
     key: "description",
     width: 200,
     render: (_, { description }) => {
-      return <TruncatedText text={description} maxWidth={200} />;
-    }
-  },
-  {
-    title: "Danh mục",
-    dataIndex: "categories",
-    key: "categories",
-    width: 100,
-    render: (_, { categories }) => {
-      return categories.map((category) => (
-        <Tag
-          color={CategoryTypesMap.get(category.type)?.color}
-          key={category.id}
-        >
-          {category.name}
-        </Tag>
-      ));
-    }
-  },
-  
-  {
-    title: "Wifi",
-    dataIndex: "wifi",
-    key: "wifi",
-    width: 200,
-    render: (_, { wifi }) => {
       return (
-        <Tag color="blue" key={wifi.name}>
-          {wifi.name}: {wifi.password}
-        </Tag>
-      );
+        <Button onClick={() => onShowDescription(description)}>Xem nội dung</Button>
+    );
     }
   },
+  {
+    title: "Ảnh",
+    dataIndex: "photos",
+    key: "photos",
+    width: 200,
+    render: (_, { photos }) => {
+      return (
+        <Button onClick={() => onShowPhotos(photos)}>Xem ảnh</Button>
+      )
+    }
+  },
+
+  // {
+  //   title: "Danh mục",
+  //   dataIndex: "categories",
+  //   key: "categories",
+  //   width: 100,
+  //   render: (_, { categories }) => {
+  //     return categories.map((category) => (
+  //       <Tag
+  //         color={CategoryTypesMap.get(category.type)?.color}
+  //         key={category.id}
+  //       >
+  //         {category.name}
+  //       </Tag>
+  //     ));
+  //   }
+  // },
+  // {
+  //   title: "Wifi",
+  //   dataIndex: "wifi",
+  //   key: "wifi",
+  //   width: 200,
+  //   render: (_, { wifi }) => {
+  //     return (
+  //       <Tag color="blue" key={wifi.name}>
+  //         {wifi.name}: {wifi.password}
+  //       </Tag>
+  //     );
+  //   }
+  // },
   {
     title: "Giá",
     dataIndex: "price",
@@ -99,8 +117,8 @@ const columns: ColumnsType<App.Types.Place.PlaceResponse> = [
     width: 120,
     render: (_, { price }) => {
       return (
-        <Tag color="blue" key={price.min}>
-          {price.min} - {price.max}
+        <Tag color="blue" key={price?.min}>
+          {price?.min} - {price?.max}
         </Tag>
       );
     }
@@ -194,6 +212,6 @@ const columns: ColumnsType<App.Types.Place.PlaceResponse> = [
       );
     }
   }
-];
+]);
 
 export { columns };

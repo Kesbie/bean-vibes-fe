@@ -7,7 +7,7 @@ const ServiceSelect = () => {
 
   const { data: services } = useQuery({
     queryKey: ["services"],
-    queryFn: () => categoryService.getCategories({ type: CATEGORY_TYPES.SERVICE }).then((res) => res.data.results.map((service) => ({
+    queryFn: () => categoryService.getCategories({ type: CATEGORY_TYPES.SERVICE, limit: 30 }).then((res) => res.data.results.map((service) => ({
       label: service.name,
       value: service.id,
     }))),

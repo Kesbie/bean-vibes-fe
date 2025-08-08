@@ -2,6 +2,7 @@ declare namespace App.Types.User {
   type UserResponse = App.Types.Base.BaseResponse & {
     email: string;
     name: string;
+    avatar?: Place.Photo;
     role?: string;
     isEmailVerified?: boolean;
     favorites?: string[];

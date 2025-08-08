@@ -1,11 +1,13 @@
-import { Modal } from "antd";
+import { Input, Modal } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import React from "react";
 
 export const useConfirmModal = () => {
+  const [reason, setReason] = React.useState<string>("");
+
   const showConfirm = (
     title: string,
-    content: string,
+    content: React.ReactNode,
     onOk: () => void,
     onCancel?: () => void,
     okText: string = "Xác nhận",
@@ -69,13 +71,16 @@ export const useConfirmModal = () => {
 
   const showRejectConfirm = (
     itemName: string,
-    onOk: () => void,
+    onOk: (reason: string) => void,
     onCancel?: () => void
   ) => {
     showConfirm(
       "Xác nhận từ chối",
-      `Bạn có chắc chắn muốn từ chối "${itemName}"?`,
-      onOk,
+      <div className="flex flex-col gap-2">
+        <p>Bạn có chắc chắn muốn từ chối &quot;{itemName}&quot;?</p>
+        <Input.TextArea onChange={(e) => setReason(e.target.value)} placeholder="Nhập lý do" rows={4} />
+      </div>,
+      () => onOk(reason),
       onCancel,
       "Từ chối",
       "Hủy"

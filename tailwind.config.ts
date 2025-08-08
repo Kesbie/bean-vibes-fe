@@ -29,11 +29,6 @@ const config: Config = {
           900: '#7f1d1d',
         },
       },
-      aspectRatio: {
-        '1/1': '1 / 1',
-        '16/9': '16 / 9',
-        '9/16': '9 / 16',
-      },
       keyframes: {
         loading: {
           '0%': { transform: 'translateX(-100%)' },
@@ -42,6 +37,11 @@ const config: Config = {
       },
       animation: {
         loading: 'loading 1s ease-in-out infinite'
+      },
+      aspectRatio: {
+        '1/1': '1 / 1',
+        '16/9': '16 / 9',
+        '9/16': '9 / 16',
       }
     },
   },

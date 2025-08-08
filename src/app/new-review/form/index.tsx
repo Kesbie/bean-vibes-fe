@@ -1,14 +1,61 @@
 import { Button, Divider, Form, Input, Switch, Typography } from "antd";
 import Rating from "./Rate";
-import PhotoUpload from "@/components/places/Upload";
 import React from "react";
 import Place from "./Place";
+import { useCustomMutation } from "@/hooks/useQuery";
+import { ratingService, reviewService } from "@/services";
+import CustomUpload from "@/components/form-items/customUpload";
+import { pick } from "lodash";
+import { useRouter } from "next/navigation";
 
-const NewReviewForm = () => {
+type Props = {
+  place?: App.Types.Place.PlaceResponse;
+  onSuccess?: (place: App.Types.Place.PlaceResponse) => void;
+};
+
+const NewReviewForm = (props: Props) => {
+  const { place, onSuccess } = props;
+
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const handleSubmit = (values: any) => {
-    console.log(values);
+  const { mutate: ratePlace } = useCustomMutation({
+    mutationFn: (values: App.Types.Rating.RatingCreate) => {
+      return ratingService.ratePlace(values);
+    },
+    messageConfigs: {
+      successMessage: "Xếp hạng thành công!",
+      errorMessage: "Xếp hạng thất bại!",
+    },
+  });
+
+  const { mutateAsync: createReview } = useCustomMutation({
+    mutationFn: (values: App.Types.Review.CreateReviewData) => {
+      return reviewService.createReview(values);
+    },
+    messageConfigs: {
+      successMessage: "Đánh giá thành công!",
+      errorMessage: "Đánh giá thất bại!",
+    },
+  });
+
+  const handleSubmit = (values: App.Types.Review.CreateReviewData) => {
+    setIsLoading(true);
+
+    const rating = { ...values.rating, place: values.place.id };
+
+    const reviewPayload = {
+      ...pick(values, "title", "content", "photos", "isAnonymous"),
+      place: values.place.id,
+    }
+
+    ratePlace(rating);
+    createReview(reviewPayload, {
+      onSuccess: () => {
+        setIsLoading(false);
+        onSuccess?.(values.place);
+      },
+    });
+    
   };
 
   return (
@@ -25,7 +72,8 @@ const NewReviewForm = () => {
           service: 5,
           staffAttitude: 5
         },
-        isAnonymous: false
+        isAnonymous: false,
+        place: place
       }}
     >
       <Typography.Text className="text-lg font-bold text-primary">
@@ -72,7 +120,10 @@ const NewReviewForm = () => {
         <Input.TextArea rows={4} placeholder="Nhập nội dung đánh giá" />
       </Form.Item>
 
-      <PhotoUpload />
+      <Form.Item name="photos">
+        <CustomUpload />
+      </Form.Item>
+
       <Form.Item name="isAnonymous" label="Đánh giá ẩn danh">
         <Switch />
       </Form.Item>

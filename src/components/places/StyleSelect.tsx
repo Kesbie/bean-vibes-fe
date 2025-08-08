@@ -7,7 +7,7 @@ const StyleSelect = () => {
 
   const { data: styles } = useQuery({
     queryKey: ["styles"],
-    queryFn: () => categoryService.getCategories({ type: CATEGORY_TYPES.STYLE }).then((res) => res.data.results.map((style) => ({
+    queryFn: () => categoryService.getCategories({ type: CATEGORY_TYPES.STYLE, limit: 30 }).then((res) => res.data.results.map((style) => ({
       label: style.name,
       value: style.id,
     }))),

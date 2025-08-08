@@ -1,12 +1,12 @@
 import { placeService } from "@/services";
 import { SearchOutlined } from "@ant-design/icons";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Form, Image, Input, Modal, Select, Typography } from "antd";
+import { Button, Image, Input, Modal, Typography } from "antd";
 import React from "react";
 
 type PlaceProps = {
-  value?: string;
-  onChange?: (value: string) => void;
+  value?: App.Types.Place.PlaceResponse;
+  onChange?: (value: App.Types.Place.PlaceResponse) => void;
 };
 
 type PlaceItemProps = {
@@ -25,7 +25,7 @@ const PlaceItem = (props: PlaceItemProps) => {
     >
       <Image
         className="min-w-[40px] rounded-md"
-        src={place.photos[0]}
+        src={place.photos?.[0]?.url || "https://ik.imagekit.io/reviewcafe/default-place.png"}
         alt={place.name}
         width={size === "small" ? 40 : 80}
         height={size === "small" ? 40 : 80}
@@ -49,10 +49,10 @@ const PlaceItem = (props: PlaceItemProps) => {
 };
 
 const Place = (props: PlaceProps) => {
-  const { value, onChange } = props;
+  const { value , onChange } = props;
   const [isOpen, setIsOpen] = React.useState(false);
   const [currentPlace, setCurrentPlace] =
-    React.useState<App.Types.Place.PlaceResponse | null>(null);
+    React.useState<App.Types.Place.PlaceResponse | null>(value);
 
   const { data: places } = useQuery({
     queryKey: ["places"],
@@ -75,7 +75,7 @@ const Place = (props: PlaceProps) => {
   const handleSelect = React.useCallback(
     (place: App.Types.Place.PlaceResponse) => {
       setCurrentPlace(place);
-      onChange?.(place.id);
+      onChange?.(place);
       hideModal();
     },
     [onChange, hideModal]
@@ -107,7 +107,7 @@ const Place = (props: PlaceProps) => {
           <Input allowClear size="large" placeholder="Tìm kiếm địa điểm" />
 
           <div className="mt-4 flex flex-col h-full max-h-[250px] overflow-y-auto">
-            {places?.map((place: any) => (
+            {places?.map((place: App.Types.Place.PlaceResponse) => (
               <PlaceItem key={place.id} place={place} onSelect={handleSelect} />
             ))}
           </div>

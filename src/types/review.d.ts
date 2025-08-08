@@ -1,45 +1,35 @@
 declare namespace App.Types.Review {
-  export interface ReviewResponse {
-    _id: string;
+  export type ReviewResponse = Base.BaseResponse & {
+    place?: Place.PlaceResponse;
+    user?: User.UserResponse;
+    title: string;
     content: string;
-    rating: number;
-    placeId: string;
-    userId?: string;
-    user?: {
-      _id: string;
-      name: string;
-      email: string;
-      avatar?: string;
-    };
     isAnonymous: boolean;
-    reactions?: ReactionResponse[];
-    comments?: CommentResponse[];
-    helpfulCount: number;
-    viewCount?: number;
-    createdAt: string;
-    updatedAt: string;
+    reactions?: Reaction.ReactionResponse[];
+    comments?: Comment.CommentResponse[];
   }
 
-  export interface CreateReviewRequest {
+  export interface CreateReviewData {
+    place: string;
+    user?: string;
+    title: string;
     content: string;
-    rating: number;
-    placeId: string;
+    photos: string[];
     isAnonymous?: boolean;
   }
 
-  export interface UpdateReviewRequest {
-    id: string;
+  export interface UpdateReviewData {
+    title?: string;
     content?: string;
-    rating?: number;
+    photos?: string[];
     isAnonymous?: boolean;
   }
 
-  export interface ReviewFilters {
+  export type ReviewFilters = Base.BaseFilter & {
+    place?: string;
+    user?: string;
     rating?: number;
     isAnonymous?: boolean;
-    sortBy?: string;
-    limit?: number;
-    page?: number;
   }
 }
 

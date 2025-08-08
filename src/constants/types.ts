@@ -31,6 +31,11 @@ const SOCIAL_TYPES = {
   WEBSITE: 'website',
 } as const;
 
+const OPEN_STATUS = {
+  OPEN: 'open',
+  CLOSE: 'close',
+} as const;
+
 const RATING_TYPES = {
   LOCATION: 'location',
   DRINK_QUALITY: 'drinkQuality',
@@ -47,4 +52,21 @@ const RATE_QUALITY = {
   EXCELLENT: 'excellent',
 } as const;
 
-export { RESTRICTED_WORD_TYPES, CATEGORY_TYPES, PLACE_STATUS, PLACE_APPROVAL_STATUS, SOCIAL_TYPES, RATING_TYPES, RATE_QUALITY };
+const REPORT_STATUS = {
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+} as const;
+
+const REPORT_TYPES = {
+  REVIEW: 'Review',
+  COMMENT: 'Comment',
+} as const;
+
+const REPORT_RESOLVED_ACTIONS = {
+  DELETE: 'delete',
+  HIDE: 'hide',
+  BAN_USER: 'ban_user',
+  WARN_USER: 'warn_user',
+} as const;
+
+export { RESTRICTED_WORD_TYPES, CATEGORY_TYPES, PLACE_STATUS, PLACE_APPROVAL_STATUS, SOCIAL_TYPES, RATING_TYPES, RATE_QUALITY, OPEN_STATUS, REPORT_STATUS, REPORT_TYPES, REPORT_RESOLVED_ACTIONS };

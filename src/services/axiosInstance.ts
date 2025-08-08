@@ -57,7 +57,7 @@ const refreshToken = async () => {
 
 const axiosInstance = axios.create({
   baseURL: appConfigs.api.url,
-  timeout: 10_000,
+  timeout: 60_000,
   validateStatus: (status) => status >= 200 && status < 600,
   paramsSerializer: (params) => {
     return qs.stringify(params, { arrayFormat: 'repeat' });

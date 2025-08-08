@@ -37,11 +37,20 @@ const Table = <T,>(props: TableProps<T>) => {
   // const { data } = useCustomPaginatedQuery({...apiOptions, enabled: !dataSource});
 
   const [tableHeight, setTableHeight] = React.useState(600);
+  const [isClient, setIsClient] = React.useState(false);
   // ref is the Table ref.
   const ref = React.useRef<HTMLDivElement>(null);
 
+  React.useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   React.useLayoutEffect(() => {
+    if (!isClient) return;
+    
     const node = ref.current;
+    if (!node) return;
+    
     const { top } = node.getBoundingClientRect();
 
     // normally TABLE_HEADER_HEIGHT would be 55.
@@ -64,7 +73,7 @@ const Table = <T,>(props: TableProps<T>) => {
     return () => {
       window.removeEventListener("resize", handleResize);
     };
-  }, [ref, pagination]);
+  }, [ref, pagination, isClient]);
 
   const handleSelectChange = React.useCallback(
     (

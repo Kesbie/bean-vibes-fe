@@ -1,4 +1,4 @@
 declare namespace App.Services.UploadService {
-  type uploadMedia = (files: File[]) => Response<App.Types.Upload.UploadResponse[]>;
+  type upload = (files: File[]) => Response<App.Types.Place.Photo[]>;
   type getMediaById = (id: string) => Response<App.Types.Upload.UploadResponse>;
 }

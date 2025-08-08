@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Spin, Empty } from "antd";
 import { placeService } from "@/services";
 import { useQuery } from "@tanstack/react-query";
+import Image from "next/image";
 
 const FeaturedLocationsSection: React.FC = () => {
   const router = useRouter();
@@ -34,8 +35,8 @@ const FeaturedLocationsSection: React.FC = () => {
     return stars;
   };
 
-  const handlePlaceClick = (placeId: string) => {
-    router.push(`/place/${placeId}`);
+  const handlePlaceClick = (slug: string) => {
+    router.push(`/place/${slug}`);
   };
 
   const formatPrice = (price: any) => {
@@ -102,14 +103,16 @@ const FeaturedLocationsSection: React.FC = () => {
               <div
                 key={place.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
-                onClick={() => handlePlaceClick(place.id)}
+                onClick={() => handlePlaceClick(place.slug)}
               >
                 {/* Image with Hot Tag */}
                 <div className="relative">
-                  <img
-                    src={place.photos?.[0] || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=300&h=200&fit=crop&crop=center"}
+                  <Image
+                    src={place.photos?.[0]?.url || "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=300&h=200&fit=crop&crop=center"}
                     alt={place.name}
                     className="w-full h-48 object-cover"
+                    width={300}
+                    height={200}
                   />
                   {place.hotScore > 0 && (
                     <div className="absolute top-2 left-2 bg-red-600 text-white px-2 py-1 rounded text-xs font-semibold">

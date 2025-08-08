@@ -6,3 +6,5 @@ export * as restrictedWordService from './restrictedWords';
 export * as uploadService from './uploads';
 export * as placeService from './places';
 export * as reviewService from './reviews';
+export * as ratingService from './ratings';
+export * as reportService from './reports';

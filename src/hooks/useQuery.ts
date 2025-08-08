@@ -1,8 +1,8 @@
-import { MutationFunction, useMutation, useQuery, UseQueryOptions } from "@tanstack/react-query";
+import { MutationFunction, useMutation, UseMutationOptions, useQuery, UseQueryOptions } from "@tanstack/react-query";
 import { message } from "antd";
 
-export type UseCustomMutationConfigs<T> = {
-  mutationFn: MutationFunction<App.Services.BaseDataResponse<T>, unknown>;
+export type UseCustomMutationConfigs<T> = Omit<UseMutationOptions<T>, 'mutationFn' | 'onSuccess' | 'onError'> & {
+  mutationFn: MutationFunction<T, unknown>;
   onSuccess?: (res: T) => void;
   onError?: (error: unknown) => void;
   messageConfigs?: {
@@ -25,7 +25,7 @@ const useCustomPaginatedQuery = <T>(configs: UseCustomPaginatedQueryConfigs<T>) 
 };
 
 const useCustomMutation = <T>(configs: UseCustomMutationConfigs<T>) => {
-  const { mutationFn, messageConfigs, onSuccess, onError } = configs;
+  const { mutationFn, messageConfigs, onSuccess, onError, ...restConfigs } = configs;
   const { successMessage = 'Thành công', errorMessage = 'Có lỗi xảy ra' } = messageConfigs || {};
 
   const mutation = useMutation({
@@ -39,6 +39,11 @@ const useCustomMutation = <T>(configs: UseCustomMutationConfigs<T>) => {
         onError?.(res.message);
       }
     },
+    onError: (error) => {
+      message.error(errorMessage);
+      onError?.(error);
+    },
+    ...restConfigs as UseMutationOptions<T>,
   });
 
   return mutation;
