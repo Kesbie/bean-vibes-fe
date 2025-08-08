@@ -6,33 +6,50 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
 import "swiper/css/navigation";
+import { CATEGORY_TYPES  } from "@/constants";
 
 const PurposeSection: React.FC = () => {
   const purposes = [
     {
       id: 1,
-      title: "Chill",
-      image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=300&h=300&fit=crop&crop=center",
-      description: "Thư giãn và tận hưởng"
+      name: 'Sống ảo',
+      description: 'Không gian yên tĩnh phù hợp cho việc học tập, làm việc',
+      type: CATEGORY_TYPES.PURPOSE,
+      thumbnail: 'https://toidicafe.vn/static/images/purpose/song-ao-1647441301274.jpeg?w=960',
+      slug: 'song-ao'
     },
     {
       id: 2,
-      title: "Đọc Sách",
-      image: "https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=300&h=300&fit=crop&crop=center",
-      description: "Không gian yên tĩnh để đọc"
+      name: 'Hẹn hò',
+      description: 'Không gian lãng mạn phù hợp cho các cặp đôi',
+      type: CATEGORY_TYPES.PURPOSE,
+      thumbnail: 'https://toidicafe.vn/static/images/purpose/hen-ho-1647441284779.jpeg',
+      slug: 'hen-ho'
     },
     {
       id: 3,
-      title: "Hẹn Hò",
-      image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=300&h=300&fit=crop&crop=center",
-      description: "Lãng mạn và ấm cúng"
+      name: 'Làm việc',
+      description: 'Không gian thoải mái cho việc gặp gỡ bạn bè, đối tác',
+      type: CATEGORY_TYPES.PURPOSE,
+      thumbnail: 'https://toidicafe.vn/static/images/purpose/lam-viec-1647441292275.jpeg?w=960',
+      slug: 'lam-viec'
     },
     {
       id: 4,
-      title: "Làm Việc",
-      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=300&fit=crop&crop=center",
-      description: "Không gian làm việc chuyên nghiệp"
-    }
+      name: 'Đọc sách',
+      description: 'Không gian yên bình để thư giãn, đọc sách',
+      type: CATEGORY_TYPES.PURPOSE,
+      thumbnail: 'https://toidicafe.vn/static/images/purpose/doc-sach-1647441276414.jpeg',
+      slug: 'doc-sach'
+    },
+    {
+      id: 5,
+      name: 'Chill',
+      description: 'Không gian thoải mái để thư giãn, nghe nhạc',
+      type: CATEGORY_TYPES.PURPOSE,
+      thumbnail: 'https://toidicafe.vn/static/images/purpose/chill-1647441264959.jpeg?w=960',
+      slug: 'chill'
+    },
   ];
 
   return (
@@ -63,10 +80,10 @@ const PurposeSection: React.FC = () => {
             >
               {/* <a href="#" className="bg-pink-200 opacity-50 absolute z-10 top-0 left-0 w-full h-full"></a> */}
               <div className="relative bg-black">
-                <img src={purpose.image} alt={purpose.title} className="w-full h-full object-cover aspect-[16/9] group-hover:scale-105 opacity-50 transition-all duration-300" />
+                <img src={purpose.thumbnail} alt={purpose.name} className="w-full h-full object-cover aspect-[16/9] group-hover:scale-105 opacity-50 transition-all duration-300" />
                 <div className="p-4 text-center absolute top-1/2 -translate-y-1/2 left-0 w-full z-[1]">
                   <h3 className="text-2xl font-bold text-white">
-                    {purpose.title}
+                    {purpose.name}
                   </h3>
                   <p className="text-md font-semibold text-white mt-1">
                     {purpose.description}
