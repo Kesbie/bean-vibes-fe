@@ -1,84 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
-  Card,
-  Form,
-  Input,
-  Rate,
-  Button,
-  Switch,
-  message,
-  Select,
-  Spin,
-  Empty,
   Typography
 } from "antd";
-import { SearchOutlined, StarOutlined } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
-import { placeService, reviewService } from "@/services";
 import ClientLayout from "@/components/shared/ClientLayout";
 import QueryProvider from "@/components/providers/QueryProvider";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
 import NewReviewForm from "./form";
-
-const { TextArea } = Input;
-const { Option } = Select;
+import { useRouter } from "next/navigation";
 
 export default function WriteReviewPage() {
-  const [form] = Form.useForm();
   const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedPlace, setSelectedPlace] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
-
-  console.log("hello");
-
-  const { data: places, isLoading: searchingPlaces } = useQuery({
-    queryKey: ["places", "search", searchQuery],
-    queryFn: () =>
-      placeService.getPublicPlaces({
-        search: searchQuery,
-        limit: 10
-      }),
-    enabled: searchQuery.length > 2
-  });
-
-  const handleSearch = (value: string) => {
-    setSearchQuery(value);
-  };
-
-  const handlePlaceSelect = (placeId: string) => {
-    const place = places?.results?.find((p: any) => p.id === placeId);
-    setSelectedPlace(place);
-    form.setFieldsValue({ placeId });
-  };
-
-  const handleSubmit = async (values: any) => {
-    if (!selectedPlace) {
-      message.error("Vui lòng chọn địa điểm");
-      return;
-    }
-
-    try {
-      setLoading(true);
-      await reviewService.createReview({
-        content: values.content,
-        rating: values.rating,
-        placeId: selectedPlace.id,
-        isAnonymous: values.isAnonymous || false
-      });
-
-      message.success("Đánh giá đã được đăng thành công!");
-      router.push(`/place/${selectedPlace.id}`);
-    } catch (error) {
-      console.error("Error creating review:", error);
-      message.error("Có lỗi xảy ra khi đăng đánh giá");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <QueryProvider>
@@ -92,7 +24,9 @@ export default function WriteReviewPage() {
               Chia sẻ trải nghiệm của bạn về địa điểm yêu thích
             </Typography.Paragraph>
           </div>
-          <NewReviewForm />
+          <NewReviewForm onSuccess={() => {
+            router.push(`/place/${place.slug}`);
+          }}/>
         </div>
       </ClientLayout>
     </QueryProvider>

@@ -2,7 +2,7 @@ import { Form, Input, InputNumber, Typography } from "antd";
 import React from "react";
 
 type PriceProps = {
-  values?: {
+  value?: {
     min?: number;
     max?: number;
   };
@@ -10,10 +10,10 @@ type PriceProps = {
 };
 
 const Price = (props: PriceProps) => {
-  const { values = {}, onChange } = props;
+  const { value = {}, onChange } = props;
 
   const triggerChange = (changedValue: { min?: number; max?: number }) => {
-    onChange?.({ ...values, ...changedValue });
+    onChange?.({ ...value, ...changedValue });
   };
 
   const handleMinChange = (value: number) => {
@@ -32,7 +32,7 @@ const Price = (props: PriceProps) => {
     <div className="flex items-center gap-2">
       <InputNumber
         placeholder="Nhập giá thấp nhất"
-        defaultValue={values?.min || 10000}
+        value={value?.min}
         onChange={handleMinChange}
         className="w-full"
         suffix="đ"
@@ -40,7 +40,7 @@ const Price = (props: PriceProps) => {
       <Typography.Text>-</Typography.Text>
       <InputNumber
         placeholder="Nhập giá cao nhất"
-        defaultValue={values?.max || 1000000}
+        value={value?.max}
         onChange={handleMaxChange}
         className="w-full"
         suffix="đ"

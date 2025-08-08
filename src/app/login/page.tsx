@@ -45,10 +45,10 @@ export default function LoginPage() {
         <Card className="shadow-xl border-0">
           <div className="text-center mb-8">
             <Title level={2} className="mb-2 text-gray-800">
-              Welcome Back
+              Chào mừng trở lại
             </Title>
             <Text type="secondary" className="text-base">
-              Sign in to your account to continue
+              Đăng nhập vào tài khoản của bạn để tiếp tục
             </Text>
           </div>
 
@@ -74,13 +74,13 @@ export default function LoginPage() {
               name="email"
               label="Email"
               rules={[
-                { required: true, message: "Please enter your email" },
-                { type: "email", message: "Please enter a valid email" }
+                { required: true, message: "Vui lòng nhập email" },
+                { type: "email", message: "Vui lòng nhập email hợp lệ" }
               ]}
             >
               <Input
                 prefix={<UserOutlined className="text-gray-400" />}
-                placeholder="Enter your email"
+                placeholder="Nhập email"
                 autoComplete="email"
               />
             </Form.Item>
@@ -89,13 +89,13 @@ export default function LoginPage() {
               name="password"
               label="Password"
               rules={[
-                { required: true, message: "Please enter your password" },
-                { min: 6, message: "Password must be at least 6 characters" }
+                { required: true, message: "Vui lòng nhập mật khẩu" },
+                { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự" }
               ]}
             >
               <Input.Password
                 prefix={<LockOutlined className="text-gray-400" />}
-                placeholder="Enter your password"
+                placeholder="Nhập mật khẩu"
                 autoComplete="current-password"
                 iconRender={(visible) =>
                   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -111,23 +111,23 @@ export default function LoginPage() {
                 className="w-full h-12 text-base font-medium"
                 size="large"
               >
-                {isLoginLoading ? "Signing In..." : "Sign In"}
+                {isLoginLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
             </Form.Item>
           </Form>
 
           <Divider className="my-6">
-            <Text type="secondary">or</Text>
+            <Text type="secondary">hoặc</Text>
           </Divider>
 
           <div className="text-center">
-            <Text type="secondary">Don&apos;t have an account? </Text>
+            <Text type="secondary">Bạn chưa có tài khoản? </Text>
             <Button
               type="link"
               onClick={handleRegisterClick}
               className="p-0 h-auto text-base font-medium"
             >
-              Sign up here
+              Đăng ký tại đây
             </Button>
           </div>
         </Card>

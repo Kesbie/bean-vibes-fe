@@ -1,21 +1,40 @@
-import { Form, Rate, Typography } from "antd";
+import { Rate, Typography } from "antd";
 import { RateQualityMap, RATING_TYPES, RatingTypesMap } from "@/constants";
 import React from "react";
 import { cn } from "@/lib/utils";
 
+type RatingValue = {
+  drinkQuality?: number;
+  location?: number;
+  price?: number;
+  service?: number;
+  staffAttitude?: number;
+};
+
 type RatingProps = {
-  value?: {
-    drinkQuality?: number;
-    location?: number;
-    price?: number;
-    service?: number;
-    staffAttitude?: number;
-  };
+  value?: RatingValue;
+  defaultValue?: RatingValue;
   onChange?: (value: RatingProps["value"]) => void;
 };
 
-const Rating = (props: RatingProps) => {
-  const { value, onChange } = props;
+export type Ref = {
+  getValue?: () => RatingValue;
+};
+
+const Rating = React.forwardRef<Ref, RatingProps>((props, ref) => {
+  const {
+    value = {
+      drinkQuality: 5,
+      location: 5,
+      price: 5,
+      service: 5,
+      staffAttitude: 5
+    },
+    defaultValue,
+    onChange
+  } = props;
+
+  const [internalValue, setInternalValue] = React.useState(defaultValue || value);
 
   const triggerChange = (changedValue: {
     drinkQuality?: number;
@@ -24,12 +43,19 @@ const Rating = (props: RatingProps) => {
     service?: number;
     staffAttitude?: number;
   }) => {
-    onChange?.({ ...value, ...changedValue });
+    const newInternalValue = { ...internalValue, ...changedValue };
+
+    setInternalValue(newInternalValue);
+    onChange?.(newInternalValue);
   };
 
   const handleChange = (key: string, value: number) => {
     triggerChange({ [key]: value });
   };
+
+  React.useImperativeHandle(ref, () => ({
+    getValue: () => internalValue
+  }));
 
   return (
     <div className="flex flex-col gap-2">
@@ -42,7 +68,7 @@ const Rating = (props: RatingProps) => {
             <Rate
               allowClear={false}
               className="text-primary"
-              defaultValue={value[typeValue] || 5}
+              defaultValue={internalValue?.[typeValue] || 5}
               onChange={(value) => handleChange(typeValue, value)}
             />
             <Typography.Text
@@ -54,13 +80,19 @@ const Rating = (props: RatingProps) => {
                 "before:border-r-primary before:border-y-transparent"
               )}
             >
-              {RateQualityMap.get(value[typeValue])?.title}
+              {RateQualityMap.get(internalValue?.[typeValue])?.title}
             </Typography.Text>
           </div>
         );
       })}
     </div>
   );
-};
+});
 
-export default React.memo(Rating);
+Rating.displayName = "Rating";
+
+export default React.memo(
+  Rating as (
+    props: React.PropsWithoutRef<RatingProps> & React.RefAttributes<Ref>
+  ) => ReturnType<typeof Rating>
+);

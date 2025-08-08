@@ -1,7 +1,6 @@
 "use client";
 
-import { Card, Typography, Alert } from "antd";
-import { InfoCircleOutlined } from "@ant-design/icons";
+import { Typography } from "antd";
 import ClientLayout from "@/components/shared/ClientLayout";
 import QueryProvider from "@/components/providers/QueryProvider";
 import PlaceForm from "@/components/places/PlaceForm";
@@ -22,7 +21,6 @@ export default function AddPlacePage() {
               với cộng đồng ngay!
             </Paragraph>
           </div>
-
           <PlaceForm />
         </div>
       </ClientLayout>

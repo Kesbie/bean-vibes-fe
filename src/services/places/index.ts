@@ -20,9 +20,13 @@ const getPublicPlace: App.Services.PlacesService.getPlace = (id) => {
   return promise<App.Types.Place.PlaceResponse>((axios) => axios.get(`${ENDPOINT}/${id}/info`));
 }
 
+const getPublicPlaceBySlug: App.Services.PlacesService.getPublicPlaceBySlug = (slug) => {
+  return promise<App.Types.Place.PlaceResponse>((axios) => axios.get(`${ENDPOINT}/slug/${slug}`));
+}
+
 // User APIs (cần authentication)
 const addPlace: App.Services.PlacesService.addPlace = (payload) => {
-  return promise<App.Types.Place.PlaceResponse>((axios) => axios.post(`${ENDPOINT}/user`, payload));
+  return promise<App.Types.Place.PlaceResponse>((axios) => axios.post(`${ENDPOINT}`, payload));
 }
 
 const updatePlace: App.Services.PlacesService.updatePlace = (payload) => {
@@ -46,7 +50,7 @@ const getUserPlace: App.Services.PlacesService.getUserPlace = (id) => {
 }
 
 // Admin APIs
-const getPlacesAdmin: App.Services.PlacesService.getPlacesAdmin = (filters) => {
+const getAdminPlaces: App.Services.PlacesService.getAdminPlaces = (filters) => {
   return promisePaginated<App.Types.Place.PlaceResponse>((axios) => axios.get(`${ENDPOINT}/admin`, { params: filters }));
 }
 
@@ -66,8 +70,8 @@ const deleteAdminPlace: App.Services.PlacesService.deleteAdminPlace = (id) => {
   return promise<App.Types.Place.PlaceResponse>((axios) => axios.delete(`${ENDPOINT}/admin/${id}`));
 }
 
-const approvePlace: App.Services.PlacesService.approvePlace = (id, isApproved, reason) => {
-  return promise<App.Types.Place.PlaceResponse>((axios) => axios.patch(`${ENDPOINT}/admin/${id}/approval-status`, { isApproved, reason }));
+const changePlaceApprovalStatus: App.Services.PlacesService.changePlaceApprovalStatus = (id, payload) => {
+  return promise<App.Types.Place.PlaceResponse>((axios) => axios.post(`${ENDPOINT}/${id}/approval-status`, payload));
 }
 
 // Search APIs
@@ -100,28 +104,29 @@ const checkPlaceContent: App.Services.PlacesService.checkPlaceContent = (content
   return promise<App.Types.Place.ContentCheckResponse>((axios) => axios.post(`${ENDPOINT}/user/check-content`, { content }));
 }
 
-export { 
-  getPlaces, 
-  getPublicPlaces, 
-  getPlace, 
-  getPublicPlace, 
-  addPlace, 
-  updatePlace, 
-  deletePlace, 
+export {
+  getPlaces,
+  getPublicPlaces,
+  getPlace,
+  getPublicPlace,
+  addPlace,
+  updatePlace,
+  deletePlace,
   getUserPlaces,
   getMyPlaces,
   getUserPlace,
-  getPlacesAdmin, 
+  getAdminPlaces,
   getPendingPlaces,
   getAdminPlace,
   updateAdminPlace,
   deleteAdminPlace,
-  approvePlace,
   searchPlaces,
   getTrendingPlaces,
   getHotPlacesWeekly,
   getVerifiedPlaces,
   getPlacesByCategory,
   getHotPlacesByCategory,
-  checkPlaceContent
+  checkPlaceContent,
+  getPublicPlaceBySlug,
+  changePlaceApprovalStatus
 };

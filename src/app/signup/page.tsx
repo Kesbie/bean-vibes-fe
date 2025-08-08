@@ -92,17 +92,17 @@ export default function SignupPage() {
           <Card className="shadow-xl border-0">
             <div className="text-center mb-8">
               <Title level={2} className="mb-2 text-gray-800">
-                Check Your Email
+                Kiểm tra email của bạn
               </Title>
               <Text type="secondary" className="text-base">
-                We&apos;ve sent you a verification link
+                Chúng tôi đã gửi cho bạn một liên kết xác thực
               </Text>
             </div>
 
             <div className="text-center mb-8">
               <div className="text-6xl text-green-500 mb-4">📧</div>
               <Title level={3} className="mb-4">
-                Verify Your Email
+                Xác thực email của bạn
               </Title>
               <Text className="text-base text-gray-600 mb-6 block">
                 {message}
@@ -110,7 +110,7 @@ export default function SignupPage() {
 
               <Alert
                 message="Important Notice"
-                description="You must verify your email to comment, like, or review. Please check your inbox and click the verification link."
+                description="Bạn phải xác thực email của bạn để bình luận, thích hoặc đánh giá. Vui lòng kiểm tra hộp thư của bạn và nhấp vào liên kết xác thực."
                 type="warning"
                 showIcon
                 className="mb-6"
@@ -125,7 +125,7 @@ export default function SignupPage() {
                 className="mb-4"
                 loading={isLoading}
               >
-                Verify Now
+                Xác thực ngay
               </Button>
               <Button
                 type="primary"
@@ -133,7 +133,7 @@ export default function SignupPage() {
                 size="large"
                 className="mb-4"
               >
-                Go to Home
+                Đi đến trang chủ
               </Button>
             </div>
           </Card>
@@ -148,10 +148,10 @@ export default function SignupPage() {
         <Card className="shadow-xl border-0">
           <div className="text-center mb-8">
             <Title level={2} className="mb-2 text-gray-800">
-              Create Account
+              Tạo tài khoản
             </Title>
             <Text type="secondary" className="text-base">
-              Join us and start your journey
+              Tham gia vào cộng đồng của chúng tôi và bắt đầu hành trình của bạn
             </Text>
           </div>
 
@@ -175,15 +175,15 @@ export default function SignupPage() {
           >
             <Form.Item
               name="name"
-              label="Full Name"
+              label="Tên đầy đủ"
               rules={[
-                { required: true, message: "Please enter your full name" },
-                { min: 2, message: "Name must be at least 2 characters" }
+                { required: true, message: "Vui lòng nhập tên của bạn" },
+                { min: 2, message: "Tên phải có ít nhất 2 ký tự" }
               ]}
             >
               <Input
                 prefix={<UserOutlined className="text-gray-400" />}
-                placeholder="Enter your full name"
+                placeholder="Nhập tên của bạn"
                 autoComplete="name"
               />
             </Form.Item>
@@ -192,32 +192,32 @@ export default function SignupPage() {
               name="email"
               label="Email"
               rules={[
-                { required: true, message: "Please enter your email" },
-                { type: "email", message: "Please enter a valid email" }
+                { required: true, message: "Vui lòng nhập email" },
+                { type: "email", message: "Vui lòng nhập email hợp lệ" }
               ]}
             >
               <Input
                 prefix={<MailOutlined className="text-gray-400" />}
-                placeholder="Enter your email"
+                placeholder="Nhập email"
                 autoComplete="email"
               />
             </Form.Item>
 
             <Form.Item
               name="password"
-              label="Password"
+                label="Mật khẩu"
               rules={[
-                { required: true, message: "Please enter your password" },
-                { min: 6, message: "Password must be at least 6 characters" },
+                { required: true, message: "Vui lòng nhập mật khẩu" },
+                { min: 6, message: "Mật khẩu phải có ít nhất 6 ký tự" },
                 {
                   pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-                  message: "Password must contain at least one uppercase letter, one lowercase letter, and one number"
+                  message: "Mật khẩu phải có ít nhất một chữ cái viết hoa, một chữ cái viết thường và một số"
                 }
               ]}
             >
               <Input.Password
                 prefix={<LockOutlined className="text-gray-400" />}
-                placeholder="Enter your password"
+                placeholder="Nhập mật khẩu"
                 autoComplete="new-password"
                 iconRender={(visible) =>
                   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -227,10 +227,10 @@ export default function SignupPage() {
 
             <Form.Item
               name="confirmPassword"
-              label="Confirm Password"
+                label="Xác nhận mật khẩu"
               dependencies={['password']}
               rules={[
-                { required: true, message: "Please confirm your password" },
+                { required: true, message: "Vui lòng xác nhận mật khẩu" },
                 ({ getFieldValue }) => ({
                   validator(_, value) {
                     if (!value || getFieldValue('password') === value) {
@@ -243,7 +243,7 @@ export default function SignupPage() {
             >
               <Input.Password
                 prefix={<LockOutlined className="text-gray-400" />}
-                placeholder="Confirm your password"
+                placeholder="Xác nhận mật khẩu"
                 autoComplete="new-password"
                 iconRender={(visible) =>
                   visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -259,23 +259,23 @@ export default function SignupPage() {
                 className="w-full h-12 text-base font-medium"
                 size="large"
               >
-                {isLoading ? "Creating Account..." : "Create Account"}
+                {isLoading ? "Đang tạo tài khoản..." : "Tạo tài khoản"}
               </Button>
             </Form.Item>
           </Form>
 
           <Divider className="my-6">
-            <Text type="secondary">or</Text>
+              <Text type="secondary">hoặc</Text>
           </Divider>
 
           <div className="text-center">
-            <Text type="secondary">Already have an account? </Text>
+            <Text type="secondary">Đã có tài khoản? </Text>
             <Button
               type="link"
               onClick={handleLoginClick}
               className="p-0 h-auto text-base font-medium"
             >
-              Sign in here
+              Đăng nhập tại đây
             </Button>
           </div>
         </Card>

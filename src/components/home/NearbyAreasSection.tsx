@@ -13,7 +13,7 @@ const NearbyAreasSection: React.FC = () => {
 
   const { data: regions } = useQuery({
     queryKey: ["regions"],
-    queryFn: () => categoryService.getCategories({ type: "region" }).then((res) => res.data.results),
+    queryFn: () => categoryService.getCategories({ type: "region", limit: 4 }).then((res) => res.data.results),
   });
 
   const handleAreaClick = (place: any) => {
@@ -97,7 +97,7 @@ const NearbyAreasSection: React.FC = () => {
         {/* Section Title */}
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900 mb-4">
-            Khu vực gần đây
+            Khu vực nổi bật
           </h2>
         </div>
 
@@ -109,7 +109,7 @@ const NearbyAreasSection: React.FC = () => {
                 <div
                   key={region.name}
                   className="group cursor-pointer transform transition-transform hover:scale-105"
-                  onClick={() => router.push(`/search?district=${encodeURIComponent(region.name)}`)}
+                  onClick={() => router.push(`/search?region=${encodeURIComponent(region.slug)}`)}
                 >
                   <div className="bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="aspect-square relative">

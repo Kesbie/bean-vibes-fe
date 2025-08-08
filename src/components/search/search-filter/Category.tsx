@@ -1,6 +1,6 @@
 "use client";
 
-import { Checkbox, Collapse } from "antd";
+import { Checkbox, Collapse, Typography } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
 import { CategoryTypesMap } from "@/constants";
 import React from "react";
@@ -23,7 +23,7 @@ const CategoryFilter = (props: Props) => {
 
   const { data: categories } = useCustomPaginatedQuery({
     queryKey: ["category", label],
-    api: categoryService.getCategories({ type: label }),
+    api: categoryService.getCategories({ type: label, limit: 30 }),
     enabled: !!label
   });
 
@@ -50,7 +50,11 @@ const CategoryFilter = (props: Props) => {
 
     return {
       key: label,
-      label: CategoryTypesMap.get(label)?.title,
+      label: (
+        <Typography.Text className="text-lg font-semibold text-gray-900">
+          {CategoryTypesMap.get(label)?.title}
+        </Typography.Text>
+      ),
       children: (
         <Checkbox.Group
           onChange={handleChange}

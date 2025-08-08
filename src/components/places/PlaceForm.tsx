@@ -1,19 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Select,
-  message,
-  Typography,
-  Divider
-} from "antd";
+import { Form, Input, Button, Typography, Divider } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { placeService, categoryService } from "@/services";
-import type { UploadFile } from "antd/es/upload/interface";
+import { placeService } from "@/services";
 import RegionSelect from "./RegionSelect";
 import OpenTime from "./OpenTime";
 import Wifi from "./Wifi";
@@ -22,19 +11,52 @@ import StyleSelect from "./StyleSelect";
 import ServiceSelect from "./ServiceSelect";
 import PurposeSelect from "./PurposeSelect";
 import Socials from "./Socials";
-import PhotoUpload from "./Upload";
+import { useCustomMutation } from "@/hooks/useQuery";
+import { pick } from "lodash";
+import CustomUpload from "../form-items/customUpload";
+import { useRouter } from "next/navigation";
 
 const { TextArea } = Input;
-const { Option } = Select;
 
 export default function PlaceForm() {
-  
   const [form] = Form.useForm();
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const { mutate: createPlace, isPending } = useCustomMutation({
+    mutationFn: (values: any) => placeService.addPlace(values),
+    messageConfigs: {
+      successMessage: "Thêm địa điểm thành công",
+      errorMessage: "Thêm địa điểm thất bại"
+    },
+    onSuccess: () => {
+      router.push("/add-place/success");
+    }
+  });
 
-  const handleSubmit = async (values: any) => {
-    console.log(values);
+  const handleSubmit = (values: App.Types.Place.PlaceCreate) => {
+    const payload = {
+      ...pick(values, [
+        "name",
+        "description",
+        "time",
+        "price",
+        "wifi",
+        "socials",
+        "photos"
+      ]),
+      address: {
+        fullAddress: values.address
+      },
+      categories: [
+        values?.region || "",
+        ...(values?.styles || []),
+        ...(values?.services || []),
+        ...(values?.purposes || [])
+      ]
+    };
+
+    console.log(payload);
+
+    createPlace(payload);
   };
 
   return (
@@ -45,24 +67,30 @@ export default function PlaceForm() {
       wrapperCol={{ span: 20 }}
       labelAlign="left"
       initialValues={{
-        name: "The Alley",
-        address: "120 Yên Lãng",
-        description: "Yên Lãng quê tôi",
-        wifi: {
-          name: "thealley",
-          password: "120yenlang"
+        time: {
+          open: "08:00",
+          close: "22:00"
         },
-        socials: [
-          {
-            type: "facebook",
-            url: "https://facebook.com/"
-          }
-        ],
-        region: "6886b954248c5c75361b7c7f",
-        styles: ["6886ac57c0394f1b55fef0b3", "6886ac57c0394f1b55fef0b4"],
-        purposes: ["6886ac57c0394f1b55fef0b7", "6886ac57c0394f1b55fef0b8"],
-        services: ["6886ac57c0394f1b55fef0b0", "6886ac57c0394f1b55fef0af"]
+        price: {
+          min: 10000,
+          max: 50000
+        }
       }}
+      //   name: "The Alley",
+      //   address: "120 Yên Lãng",
+      //   description: "Yên Lãng quê tôi",
+      //   wifi: {
+      //     name: "thealley",
+      //     password: "120yenlang"
+      //   },
+      //   socials: [
+      //     {
+      //       type: "facebook",
+      //       url: "https://facebook.com/"
+      //     }
+      //   ],
+
+      // }}
     >
       <div className="">
         <Typography.Text className="text-lg font-bold text-primary">
@@ -103,8 +131,9 @@ export default function PlaceForm() {
         </Typography.Text>
         <Divider className="my-2" />
       </div>
-
-      <OpenTime />
+      <Form.Item name="time" label="Thời gian mở cửa">
+        <OpenTime />
+      </Form.Item>
       <Form.Item name="price" label="Giá">
         <Price />
       </Form.Item>
@@ -131,7 +160,10 @@ export default function PlaceForm() {
         <Divider className="my-2" />
       </div>
 
-      <PhotoUpload />
+      {/* <PhotoUpload /> */}
+      <Form.Item name="photos">
+        <CustomUpload />
+      </Form.Item>
 
       <Button
         className="w-full font-bold text-lg"
@@ -139,7 +171,7 @@ export default function PlaceForm() {
         icon={<PlusOutlined />}
         type="primary"
         htmlType="submit"
-        loading={isLoading}
+        loading={isPending}
       >
         {"Thêm địa điểm"}
       </Button>

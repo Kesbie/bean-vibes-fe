@@ -1,0 +1,3 @@
+.ant-collapse-content.ant-collapse-content-active {
+  @apply max-h-[240px] overflow-hidden overflow-y-scroll;
+}

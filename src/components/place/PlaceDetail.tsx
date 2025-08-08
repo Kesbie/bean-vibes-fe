@@ -1,83 +1,88 @@
-'use client';
+"use client";
 
+import { Typography } from "antd";
 import React from "react";
-import ImageGallery from "./ImageGallery";
-import PlaceInfo from "./PlaceInfo";
-import RatingSection from "./RatingSection";
-import ReviewSection from "./ReviewSection";
-import SuggestedPlaces from "./SuggestedPlaces";
-import LocationMap from "./LocationMap";
-
+import Box from "../box";
+import { nanoid } from "nanoid";
+import Link from "next/link";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { OPEN_STATUS, SOCIAL_TYPES } from "@/constants/types";
+import dayjs from "dayjs";
+import { OpenStatusMap } from "@/constants/map";
 interface PlaceDetailProps {
-  placeId: string;
+  place: App.Types.Place.PlaceResponse;
 }
 
-const PlaceDetail: React.FC<PlaceDetailProps> = ({ placeId }) => {
-  // Mock data for the place
-  const placeData = {
-    id: placeId,
-    name: "Timeline Coffee - Hoàn Kiếm",
-    address: "7 Đình Liệt, Hàng Đào, Hoàn Kiếm",
-    priceRange: "10.000₫ - 50.000₫",
-    status: "Đang đóng cửa",
-    phone: "091 180 59 99",
-    email: "timelinecoffee79260@gmail.com",
-    rating: 5,
-    totalReviews: 5,
-    images: [
-      "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&h=600&fit=crop&crop=center",
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=300&fit=crop&crop=center",
-      "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=400&h=300&fit=crop&crop=center",
-      "https://images.unsplash.com/photo-1559925393-8be0ec4767c8?w=400&h=300&fit=crop&crop=center",
-      "https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=400&h=300&fit=crop&crop=center"
-    ],
-    amenities: [
-      { name: "Khu vực hút thuốc", icon: "🚬" },
-      { name: "Bánh ngọt", icon: "🍰" },
-      { name: "Chỗ đậu ôtô", icon: "🚗" },
-      { name: "Thanh toán bằng thẻ", icon: "💳" }
-    ],
-    categoryTags: [
-      "Timeline Coffee - Hoàn Kiếm",
-      "Cafe Ngoài Trời - Cafe View Đẹp"
-    ],
-    location: {
-      lat: 21.0285,
-      lng: 105.8542,
-      parking: "Giờ xe máy",
-      seating: "Bên ngoài trời"
-    }
-  };
+const getSocialIcon = (type: string) => {
+  switch (type) {
+    case SOCIAL_TYPES.FACEBOOK:
+      return "ph:facebook-logo-light";
+    case SOCIAL_TYPES.INSTAGRAM:
+      return "ph:instagram-logo-light";
+    case SOCIAL_TYPES.YOUTUBE:
+      return "ph:youtube-logo-light";
+    case SOCIAL_TYPES.TIKTOK:
+      return "ph:tiktok-logo-light";
+    case SOCIAL_TYPES.WEBSITE:
+      return "ph:globe-light";
+    default:
+      "";
+  }
+};
+
+const getOpenStatus = (time: App.Types.Place.Time) => {
+  const now = dayjs();
+  const openHour = dayjs(time.open, "HH:mm");
+  const closeHour = dayjs(time.close, "HH:mm");
+  if (now.isAfter(openHour) && now.isBefore(closeHour)) {
+    return OPEN_STATUS.OPEN;
+  }
+  return OPEN_STATUS.CLOSE;
+};
+
+const PlaceDetail: React.FC<PlaceDetailProps> = (props: PlaceDetailProps) => {
+  const { place } = props;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Main Content */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Place Info */}
-          <PlaceInfo place={placeData} />
-          
-          {/* Image Gallery */}
-          <ImageGallery images={placeData.images} />
-          
-          {/* Rating Section */}
-          <RatingSection rating={placeData.rating} totalReviews={placeData.totalReviews} />
-          
-          {/* Review Section */}
-          <ReviewSection />
-        </div>
-
-        {/* Right Column - Sidebar */}
-        <div className="space-y-8">
-          {/* Location Map */}
-          <LocationMap location={placeData.location} />
-          
-          {/* Suggested Places */}
-          <SuggestedPlaces />
-        </div>
+    <Box
+      title={
+        <Typography.Title level={3}>{`Thông tin chi tiết`}</Typography.Title>
+      }
+    >
+      <div className="flex flex-col gap-2 font-semibold">
+        {place.price && (
+          <Typography.Text className="flex text-base items-center gap-2">
+            <Icon icon="ph:money-light" />
+            {`${place.price.min}đ - ${place.price.max}đ`}
+          </Typography.Text>
+        )}
+        {place.time && (
+          <Typography.Text className="flex text-base items-center gap-2">
+            <Icon icon="ph:clock-light" />
+            <span
+              style={{
+                color: OpenStatusMap.get(getOpenStatus(place.time))?.color
+              }}
+            >
+              {OpenStatusMap.get(getOpenStatus(place.time))?.title}
+            </span>
+            <span className="text-gray-500">
+              {`${place.time.open} - ${place.time.close}`}
+            </span>
+          </Typography.Text>
+        )}
+        {place.socials &&
+          place.socials.map((social) => (
+            <Link href={social.url} target="_blank" key={nanoid()}>
+              <Typography.Text className="flex text-base items-center gap-2">
+                {<Icon icon={getSocialIcon(social.type)} />}
+                {place.name}
+              </Typography.Text>
+            </Link>
+          ))}
       </div>
-    </div>
+    </Box>
   );
 };
 
-export default PlaceDetail; 
+export default PlaceDetail;

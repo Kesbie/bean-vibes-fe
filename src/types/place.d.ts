@@ -19,45 +19,60 @@ declare namespace App.Types.Place {
     password: string;
   }
 
-  type PlaceResponse = Base.BaseResponse & {
+  type RatingDetails = {
+    drinkQuality: number;
+    location: number;
+    price: number;
+    service: number;
+    staffAttitude: number;
+    totalRatings: number;
+  }
+
+  type Photo = {
     id: string;
+    url: string;
+    originalName: string;
+    name: string;
+    format: string;
+    size: number;
+  }
+
+  type PlaceResponse = Base.BaseResponse & {
     name: string;
     description: string;
-    address: {
-      fullAddress: string;
-      district: string;
-      ward: string;
-      street: string;
-    };
+    address: Address.AddressResponse;
+    slug: string;
     categories: CategoryResponse[];
-    photos?: string[];
+    photos?: Photo[];
     rating?: number;
     price?: Price;
     time?: Time;
     wifi?: Wifi;
-    social?: Social[];
+    reviews?: Review.ReviewResponse[];
+    socials?: Social[];
+    averageRating?: number;
     totalRatings?: number;
     totalReviews?: number;
     hotScore?: number;
     approvalStatus?: 'pending' | 'approved' | 'rejected';
     isVerified?: boolean;
     status?: 'active' | 'inactive';
+    ratingDetails: RatingDetails;
   }
 
   interface PlaceCreate {
     name: string;
     description: string;
-    address: string;
-    latitude?: number;
-    longitude?: number;
-    phone?: string;
-    website?: string;
+    address: {
+      fullAddress: string;
+      location?: [number, number];
+    };
     time?: Time;
     price?: Price;
     wifi?: Wifi;
-    social?: Social[];
+    socials?: Social[];
     categories: string[];
-    photos?: string[];
+    photos?: Photo[];
   }
 
   interface PlaceUpdate {
@@ -78,6 +93,12 @@ declare namespace App.Types.Place {
     status?: 'active' | 'inactive';
     isApproved?: boolean;
     isVerified?: boolean;
+  }
+  
+  interface PlaceChangeApprovalStatusUpdate {
+    id: string;
+    status: 'pending' | 'approved' | 'rejected';
+    reason?: string;
   }
 
   interface ContentCheckResponse {

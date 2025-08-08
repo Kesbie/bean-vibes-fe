@@ -27,9 +27,17 @@ const normFile = (e: any) => {
   return e?.fileList;
 };
 
-const PhotoUpload = () => {
+type Props = {
+  value?: string[];
+  onChange?: (value: string[]) => void;
+};
+
+const PhotoUpload = (props: Props) => {
+  const { value, onChange } = props;
   const [previewOpen, setPreviewOpen] = React.useState(false);
   const [previewImage, setPreviewImage] = React.useState("");
+
+  const [fileList, setFileList] = React.useState<UploadFile[]>([]);
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
@@ -39,6 +47,18 @@ const PhotoUpload = () => {
     setPreviewImage(file.url || (file.preview as string));
     setPreviewOpen(true);
   };
+
+  const handleChange = React.useCallback(({ fileList }) => {
+    setFileList(fileList);
+  }, []);
+
+  console.log(fileList)
+
+  const customRequest: UploadProps['customRequest'] = React.useCallback(({ file, onSuccess }) => {
+    setTimeout(() => {
+      onSuccess(file);
+    }, 1000);
+  }, []);
 
   return (
     <Form.Item
@@ -52,7 +72,9 @@ const PhotoUpload = () => {
         maxCount={16}
         accept="image/*"
         onPreview={handlePreview}
+        onChange={handleChange}
         multiple
+        customRequest={customRequest}
       >
         <button className="flex flex-col items-center justify-center gap-1">
           <CameraOutlined className="text-lg" />

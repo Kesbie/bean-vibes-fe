@@ -11,16 +11,19 @@ const HeroSection: React.FC = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      router.push(`/search?name=${encodeURIComponent(searchQuery.trim())}`);
     }
   };
 
   return (
     <section
-      className="relative h-[500px] bg-cover bg-center py-20"
+      className="relative h-[500px] py-20"
       style={{
         background:
-          "linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.6)),url(https://ik.imagekit.io/reviewcafe/3511_zApiGKUaCd.jpg?tr=w-1800%2Cq-50) no-repeat"
+          "linear-gradient(rgba(0,0,0,.8),rgba(0,0,0,.6)),url(https://ik.imagekit.io/reviewcafe/3511_zApiGKUaCd.jpg?tr=w-1800%2Cq-50) no-repeat",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
       }}
     >
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

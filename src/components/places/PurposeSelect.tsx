@@ -7,7 +7,7 @@ const PurposeSelect = () => {
 
   const { data: purposes } = useQuery({
     queryKey: ["purposes"],
-    queryFn: () => categoryService.getCategories({ type: CATEGORY_TYPES.PURPOSE }).then((res) => res.data.results.map((purpose) => ({
+    queryFn: () => categoryService.getCategories({ type: CATEGORY_TYPES.PURPOSE, limit: 30 }).then((res) => res.data.results.map((purpose) => ({
       label: purpose.name,
       value: purpose.id,
     }))),

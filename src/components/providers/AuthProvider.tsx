@@ -97,8 +97,9 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = React.useState<
     App.Services.AuthService.LoginResponse["user"] | null
-  >(localStorageService.load("user"));
+  >(null);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [isClient, setIsClient] = React.useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -109,7 +110,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   });
 
+  // Ensure we're on the client side before accessing localStorage
   React.useEffect(() => {
+    setIsClient(true);
+    // Initialize user from localStorage only on client side
+    const userFromStorage = localStorageService.load("user");
+    setUser(userFromStorage);
+  }, []);
+
+  React.useEffect(() => {
+    if (!isClient) return; // Don't run on server side
+
     const initializeAuth = async () => {
       const accessToken = localStorageService.load("accessToken");
       const refreshTokenLocal = localStorageService.load("refreshToken");
@@ -180,11 +191,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     initializeAuth();
-  }, [pathname, router]);
+  }, [pathname, router, isClient]);
 
   // Periodic token refresh check (every 4 minutes)
   React.useEffect(() => {
-    if (!user) return; // Only run if user is authenticated
+    if (!user || !isClient) return; // Only run if user is authenticated and on client
 
     const interval = setInterval(async () => {
       const accessToken = localStorageService.load("accessToken");
@@ -204,7 +215,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     queryClient.invalidateQueries({ queryKey: ["user"] });
 
     return () => clearInterval(interval);
-  }, [user]);
+  }, [user, isClient]);
 
   const loginMutation = useMutation({
     mutationFn: authService.login,
@@ -339,7 +350,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const value = {
     user,
     isLoading: isLoading || loginMutation.isPending,
-    isAuthenticated: !!user && !!localStorageService.load("accessToken"),
+    isAuthenticated: isClient && !!user && !!localStorageService.load("accessToken"),
     login,
     signup,
     logout,

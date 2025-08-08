@@ -2,11 +2,29 @@ import { Form, TimePicker, Typography } from "antd";
 import dayjs from "dayjs";
 import React from "react";
 
-const OpenTime = () => {
+type OpenTimeProps = {
+  value?: App.Types.Place.Time;
+  onChange?: (value: App.Types.Place.Time) => void;
+};
+
+const OpenTime = (props: OpenTimeProps) => {
+  const { value, onChange } = props;
+
+  const triggerChange = (changedValue: App.Types.Place.Time) => {
+    onChange?.({ ...value, ...changedValue });
+  };
+
+  const handleChange = React.useCallback((value) => {
+    triggerChange({ open: value[0].format("HH:mm"), close: value[1].format("HH:mm") });
+  }, [])
+
   return (
-    <Form.Item name="time" label="Thời gian mở cửa">
-      <TimePicker.RangePicker defaultValue={[dayjs("08:00", "HH:mm"), dayjs("22:00", "HH:mm")]} className="w-full" format="HH:mm" />
-    </Form.Item>
+    <TimePicker.RangePicker
+      className="w-full"
+      format="HH:mm"
+      value={[dayjs(value?.open, "HH:mm"), dayjs(value?.close, "HH:mm")]}
+      onChange={handleChange}
+    />
   );
 };
 
