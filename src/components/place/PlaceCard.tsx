@@ -45,7 +45,7 @@ const PlaceCard = (props: Props) => {
         <p className="text-sm flex items-center gap-2">
           <span className="font-bold">{<Icon icon="ph:money-light" />}</span>
           <span className="font-bold">
-            {place.price.min} - {place.price.max} VND
+            {place?.price?.min} - {place?.price?.max} VND
           </span>
         </p>
         <p className="text-sm flex items-center gap-2">
@@ -89,7 +89,7 @@ const PlaceCard = (props: Props) => {
           <p className="text-sm text-gray-500 flex items-center gap-2">
             <span>{<Icon icon="ph:money-light" />}</span>
             <span className="font-bold">
-              {place.price.min} - {place.price.max} VND
+              {place?.price?.min} - {place?.price?.max} VND
             </span>
           </p>
           <p className="text-sm text-gray-500 flex items-center gap-2">
@@ -99,7 +99,7 @@ const PlaceCard = (props: Props) => {
           <p className="text-sm text-gray-500 flex items-center gap-2">
             <span>{<Icon icon="ph:clock-light" />}</span>
             <span className="font-bold">
-              {place.time.open} - {place.time.close}
+              {place?.time?.open} - {place?.time?.close}
             </span>
           </p>
         </div>

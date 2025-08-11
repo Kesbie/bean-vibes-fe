@@ -93,8 +93,8 @@ const RestrictedWordsPage = () => {
     }
   });
 
-  const { mutate: deleteRestrictedWord } = useCustomMutation({
-    mutationFn: (id: string) => placeService.deletePlace(id),
+  const { mutate: deletePlace } = useCustomMutation({
+    mutationFn: (id: string) => placeService.deleteAdminPlace(id),
     onSuccess: () => {
       refetch();
     },
@@ -158,10 +158,10 @@ const RestrictedWordsPage = () => {
   const handleDelete = React.useCallback(
     (value: App.Types.Place.PlaceResponse) => {
       showDeleteConfirm(value.name, () => {
-        deleteRestrictedWord(value.id);
+        deletePlace(value.id);
       });
     },
-    [showDeleteConfirm, deleteRestrictedWord]
+    [showDeleteConfirm, deletePlace]
   );
 
   const handleEdit = React.useCallback(

@@ -134,7 +134,7 @@ const NearbyAreasSection: React.FC = () => {
             </div>
 
             {/* Pagination Dots */}
-            <div className="flex justify-center space-x-2">
+            {/* <div className="flex justify-center space-x-2">
               {regions.map((_, index) => (
                 <div
                   key={index}
@@ -143,7 +143,7 @@ const NearbyAreasSection: React.FC = () => {
                   }`}
                 ></div>
               ))}
-            </div>
+            </div> */}
           </>
         ) : (
           <div className="flex justify-center">

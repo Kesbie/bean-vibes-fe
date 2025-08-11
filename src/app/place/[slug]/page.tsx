@@ -13,6 +13,7 @@ import PlaceDetail from "@/components/place/PlaceDetail";
 import { PlaceRating, PlaceReview } from "@/components/place";
 import PlaceContent from "@/components/place/PlaceContent";
 import React from "react";
+import PlaceMenu from "@/components/place/PlaceMenu";
 
 export default function PlaceDetailPage() {
   const params = useParams();
@@ -74,6 +75,7 @@ export default function PlaceDetailPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <PlaceRating place={place} />
             <PlaceDetail place={place} />
+            <PlaceMenu place={place} />
           </div>
           <PlaceReview place={place} />
         </div>

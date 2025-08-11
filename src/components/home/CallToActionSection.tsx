@@ -1,5 +1,6 @@
 'use client';
 
+import Link from "next/link";
 import React from "react";
 
 const CallToActionSection: React.FC = () => {
@@ -43,9 +44,9 @@ const CallToActionSection: React.FC = () => {
             <p className="text-lg text-gray-600 mb-8">
               Hãy đóng góp những địa điểm cafe tuyệt vời mà bạn đã khám phá để cộng đồng cùng thưởng thức.
             </p>
-            <button className="bg-red-600 text-white px-8 py-4 rounded-lg hover:bg-red-700 transition-colors text-lg font-semibold">
+            <Link href="/add-place" className="bg-red-600 text-white px-8 py-4 rounded-lg hover:bg-red-700 transition-colors text-lg font-semibold">
               Đóng góp địa điểm
-            </button>
+            </Link>
           </div>
         </div>
       </div>

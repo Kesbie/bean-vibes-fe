@@ -1,6 +1,6 @@
 import React from "react";
 import Box from "../box";
-import { Button, Typography } from "antd";
+import { Button, Empty, Typography } from "antd";
 import PlaceReviewItem from "./PlaceReviewItem";
 import { useCustomPaginatedQuery } from "@/hooks/useQuery";
 import { reviewService } from "@/services";
@@ -41,6 +41,13 @@ const PlaceReview = (props: Props) => {
   return (
     <Box title={boxTitle}>
       <div className="flex flex-col gap-4">
+
+        {reviews?.results?.length === 0 && (
+          <div className="flex justify-center items-center h-full">
+            <Empty className="text-center text-gray-500">Chưa có đánh giá</Empty>
+          </div>
+        )} 
+
         {reviews?.results?.map((review) => (
           <PlaceReviewItem key={review.id} review={review} />
         ))}

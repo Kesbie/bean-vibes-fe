@@ -34,7 +34,11 @@ const updatePlace: App.Services.PlacesService.updatePlace = (payload) => {
 }
 
 const deletePlace: App.Services.PlacesService.deletePlace = (id) => {
-  return promise<App.Types.Place.PlaceResponse>((axios) => axios.delete(`${ENDPOINT}/user/${id}`));
+  return promise<App.Types.Place.PlaceResponse>((axios) => axios.delete(`${ENDPOINT}/${id}`));
+}
+
+const adminDeletePlace: App.Services.PlacesService.deletePlace = (id) => {
+  return promise<App.Types.Place.PlaceResponse>((axios) => axios.delete(`${ENDPOINT}/admin/${id}`));
 }
 
 const getUserPlaces: App.Services.PlacesService.getUserPlaces = (filters) => {

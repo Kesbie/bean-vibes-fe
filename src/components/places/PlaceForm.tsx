@@ -41,7 +41,8 @@ export default function PlaceForm() {
         "price",
         "wifi",
         "socials",
-        "photos"
+        "photos",
+        "menu"
       ]),
       address: {
         fullAddress: values.address
@@ -162,6 +163,18 @@ export default function PlaceForm() {
 
       {/* <PhotoUpload /> */}
       <Form.Item name="photos">
+        <CustomUpload />
+      </Form.Item>
+
+      <div className="">
+        <Typography.Text className="text-lg font-bold text-primary">
+          Menu
+        </Typography.Text>
+        <Divider className="my-2" />
+      </div>
+
+      {/* <PhotoUpload /> */}
+      <Form.Item name="menu">
         <CustomUpload />
       </Form.Item>
 
